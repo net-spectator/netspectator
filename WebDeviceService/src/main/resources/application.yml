@@ -1,0 +1,15 @@
+server:
+  port: 8181
+  servlet:
+    context-path: /core
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/netspec
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+  hibernate:
+    ddl-auto: create
+  database-platform: org.hibernate.dialect.PostgreSQLDialect
