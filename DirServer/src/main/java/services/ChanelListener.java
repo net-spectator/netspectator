@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Connection;
 import entities.Device;
 import entities.devices.ClientHardwareInfo;
-import entities.devices.drives.Drive;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,7 +20,7 @@ public class ChanelListener {
     private String uuid;
     private final MessageSender messageSender;
     private final ConnectionsList connections;
-    private final BlackList blackList;
+    private final DisabledClients blackList;
     private final Connection client;
     private final Server server;
     private final DataBaseService dbService;
@@ -46,7 +45,7 @@ public class ChanelListener {
                 messageSender.sendMessageWithHeader("Welcome to Net Spectator server. ");
                 break;
             case "/auth":
-                if (header.length > 1 && header[1].equals(NettyBootstrap.serverParams.get("admin"))) {
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("admin"))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
                     Device device = new Device(); //убрать этот момент, имя должно браться настоящее
@@ -57,11 +56,11 @@ public class ChanelListener {
                 }
                 break;
             case "\\auth":
-                if (header.length > 1 && header[1].equals(NettyBootstrap.serverParams.get("publicKey"))) {
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("publicKey"))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithoutHeader("getId");
                 } else {
-                    NettyBootstrap.blackList.add(ctx.channel().localAddress());
+                    ClientListenersDataBus.disableClient(ctx.channel().localAddress());
                     ctx.disconnect();
                 }
                 break;
@@ -74,6 +73,7 @@ public class ChanelListener {
                 } else {
                     uuid = header[1];
                 }
+                ClientListenersDataBus.addConnection(client);
                 messageSender.sendMessageWithoutHeader("getName");
                 break;
             case "/connections":
@@ -89,8 +89,8 @@ public class ChanelListener {
             case "/shutdown":
                 server.shutdown();
                 break;
-            case "/blacklist":
-                if (!blackList.blackListOperator(header)) {
+            case "/disabledList":
+                if (!blackList.disabledClientsListOperator(header)) {
                     LOGGER.info("Bad command");
                 }
                 break;

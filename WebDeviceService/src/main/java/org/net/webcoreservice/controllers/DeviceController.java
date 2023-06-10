@@ -1,13 +1,15 @@
 package org.net.webcoreservice.controllers;
 
+import entities.Connection;
+import entities.Device;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.dto.DeviceDTO;
 import org.net.webcoreservice.services.DeviceService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import services.ClientListenersDataBus;
 
+import java.net.SocketAddress;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,7 +20,8 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @GetMapping("/getAll")
-    public List<DeviceDTO> getAllDevices(){
-        return deviceService.getAllDevices();
+    @ResponseStatus(HttpStatus.OK)
+    public List<SocketAddress> getAllDevices() {
+        return ClientListenersDataBus.getDisabledClientsList();
     }
 }

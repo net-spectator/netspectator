@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class Connection {
+public class Connection{
     private Device device;
     private boolean isAuth = false;
     @NonNull
@@ -15,8 +15,10 @@ public class Connection {
 
     @Override
     public String toString() {
-        return (device.getTitle() != null ? device.getTitle() : "NULL") + ": " + channelHandlerContext;
+        return (device != null ? device.getTitle() : "NULL") + ": " + channelHandlerContext;
     }
 
-
+    public void closeConnection() {
+        channelHandlerContext.disconnect();
+    }
 }
