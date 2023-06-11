@@ -30,15 +30,15 @@ public class UserHeaderFilter implements GlobalFilter {
                 .filter(c -> c.getAuthentication() != null)
                 .flatMap(c -> {
                     OAuth2AuthenticatedPrincipal oAuth2AuthenticatedPrincipal = mapPrincipal((OAuth2AuthenticatedPrincipal) c.getAuthentication().getPrincipal());
-                    String sub = oAuth2AuthenticatedPrincipal.getAttribute(introspect);
-                    if (Strings.isNullOrEmpty(sub)) {
+                    String introspect = oAuth2AuthenticatedPrincipal.getAttribute(this.introspect);
+                    if (Strings.isNullOrEmpty(introspect)) {
                         return Mono.error(
                                 new AccessDeniedException("Токен не прошел проверку.")
                         );
                     }
 
                     ServerHttpRequest request = exchange.getRequest().mutate()
-                            .header("x-introspect", sub).build();
+                            .header("x-introspect", introspect).build();
 
                     return chain.filter(exchange.mutate().request(request).build());
                 })
