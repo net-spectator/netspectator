@@ -2,7 +2,7 @@ package services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Connection;
-import entities.Device;
+import entities.TrackedEquipment;
 import entities.devices.ClientHardwareInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -48,7 +48,7 @@ public class ChanelListener {
                 if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("admin"))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
-                    Device device = new Device(); //убрать этот момент, имя должно браться настоящее
+                    TrackedEquipment device = new TrackedEquipment(); //убрать этот момент, имя должно браться настоящее
                     device.setTitle("Admin");
                     client.setDevice(device);
                 } else {
@@ -96,8 +96,8 @@ public class ChanelListener {
                 break;
             case "\\ClientHardwareInfo":  //в процессе доработки
                 ObjectMapper mapper = new ObjectMapper();
-                ClientHardwareInfo drive = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
-                System.out.println(drive);
+                ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
+                client.getDevice().setDeviceInfo(deviceInfo);
             default:
                 messageSender.sendMessageWithHeader("Unknown command");
                 break;
@@ -105,12 +105,12 @@ public class ChanelListener {
     }
 
     private void deviceInit(ChannelHandlerContext ctx, String[] args) {
-        Device device = dbService.getDeviceByUUID(uuid);
+        TrackedEquipment device = dbService.getTrackedEquipmentByUUID(uuid);
         if (device == null) {
-            device = new Device();
+            device = new TrackedEquipment();
             device.setTitle(args[1]);
             device.setUUID(uuid);
-            LOGGER.info(dbService.addDevice(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
+            LOGGER.info(dbService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
         }
         dbService.changeDeviceStatus(uuid, true);
         device.setIp(ctx.channel().localAddress()

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class Connection{
-    private Device device;
+    private TrackedEquipment device;
     private boolean isAuth = false;
     @NonNull
     private ChannelHandlerContext channelHandlerContext;
