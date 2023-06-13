@@ -1,8 +1,7 @@
 package entities;
 
+import entities.devices.ClientHardwareInfo;
 import lombok.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 
@@ -10,30 +9,28 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "device")
-public class Device {
+@Table(name = "tracked_equipment")
+public class TrackedEquipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @Basic
     private int id;
-
     @Column
     private String UUID;
-
     @Column
     private String title;
-
     @Column
     private String ip;
-
-    @Column(name = "hdd_free_space")
-    private double hddFreeSpace;
-
     @Column(name = "online_status")
     private int onlineStatus;
-
+    @Column
+    private String macAddress;
+    @Column(name = "tracked_status")
+    private int blackList;
     @ManyToOne
-    @JoinColumn(name="group_id")
+    @JoinColumn(name = "group_id")
     private DeviceGroup deviceGroup;
+    @Transient
+    private ClientHardwareInfo deviceInfo;
 }

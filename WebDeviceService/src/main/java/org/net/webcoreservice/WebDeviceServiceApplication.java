@@ -2,13 +2,17 @@ package org.net.webcoreservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import services.ClientListenersStarter;
 
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SpringBootApplication
 public class WebDeviceServiceApplication {
-
     public static void main(String[] args) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(ClientListenersStarter::new);
         tcpServerStart();
         SpringApplication.run(WebDeviceServiceApplication.class, args);
     }

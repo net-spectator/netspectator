@@ -11,6 +11,4 @@ public class Partition {
     private long totalSpace;
     @JsonProperty("usedSpace")
     private long usedSpace;
-    @JsonProperty("dive")
-    private Drive drive;
 }
