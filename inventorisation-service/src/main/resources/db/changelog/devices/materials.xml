@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="Materials-1" author="larionov">
+        <preConditions>
+            <not>
+                <tableExists tableName="materials"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="materials">
+            <column name="id" type="uuid">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="varchar(300)"/>
+
+            <column name="serial_number" type="varchar(100)"/>
+            
+            <column name="state" type="tinyint"/>
+            
+            <column name="responsible" type="uuid"/>
+
+            <column name="type_id" type="uuid"/>
+
+            <column name="vendor_id" type="uuid"/>
+
+            <column name="registration_id" type="bigserial"/>
+
+        </createTable>
+
+        <addPrimaryKey tableName="materials" columnNames="id" constraintName="materials.pk"/>
+        <addForeignKeyConstraint baseTableName="materials" baseColumnNames="registration_id" constraintName="materials_registration_fk"
+                                 referencedTableName="registration_numbers" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="materials" baseColumnNames="type_id" constraintName="device_type_fk"
+                                 referencedTableName="type_materials" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="materials" baseColumnNames="vendor_id" constraintName="materials_vendor_fk"
+                                 referencedTableName="vendors" referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
