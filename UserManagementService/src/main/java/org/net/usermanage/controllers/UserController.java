@@ -1,12 +1,12 @@
 package org.net.usermanage.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.net.usermanage.data.User;
 import org.net.usermanage.services.UserActualizeService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import users.data.User;
 
 import java.util.List;
 import java.util.UUID;

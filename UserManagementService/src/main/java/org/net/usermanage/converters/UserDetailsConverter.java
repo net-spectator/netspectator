@@ -2,9 +2,9 @@ package org.net.usermanage.converters;
 
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
-import org.net.usermanage.data.UserDetails;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Component;
+import users.data.UserDetails;
 
 import java.util.*;
 

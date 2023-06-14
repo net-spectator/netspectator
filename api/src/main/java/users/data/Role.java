@@ -1,4 +1,4 @@
-package org.net.usermanage.data;
+package users.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

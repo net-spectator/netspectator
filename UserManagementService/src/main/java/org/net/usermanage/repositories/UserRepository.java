@@ -1,7 +1,7 @@
 package org.net.usermanage.repositories;
 
-import org.net.usermanage.data.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import users.data.User;
 
 import java.util.Optional;
 import java.util.UUID;

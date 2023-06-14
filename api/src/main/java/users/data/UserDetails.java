@@ -1,10 +1,11 @@
-package org.net.usermanage.data;
+package users.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.JSONObject;
-import org.net.usermanage.converters.HashMapConverter;
+import users.converters.HashMapConverter;
+
 import javax.persistence.*;
 import java.util.Map;
 

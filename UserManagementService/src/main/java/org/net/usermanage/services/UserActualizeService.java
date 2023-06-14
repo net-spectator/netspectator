@@ -4,12 +4,13 @@ import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.net.usermanage.converters.UserDetailsConverter;
-import org.net.usermanage.data.Role;
-import org.net.usermanage.data.User;
-import org.net.usermanage.data.UserDetails;
 import org.net.usermanage.repositories.UserRepository;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Service;
+import users.data.Role;
+import users.data.User;
+import users.data.UserDetails;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
