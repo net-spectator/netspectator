@@ -17,8 +17,12 @@ spring:
       redis:
         enabled: false
       routes:
-        - id: test
+        - id: users
           uri: http://localhost:9090
           predicates:
-            - Path=/test/**
+            - Path=/api/v1/users/**
+        - id: checkUser
+          uri: http://localhost:9090
+          predicates:
+            - Path=/api/v1/check/**
 introspect_field: sub
