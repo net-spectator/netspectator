@@ -1,6 +1,6 @@
 package services;
 
-import entities.Device;
+import entities.TrackedEquipment;
 import entities.DeviceGroup;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -22,19 +22,19 @@ public class DataBaseService {
     Session session = null;
 
     //возвращает полный список устройств со статусами
-    public static String[] getDeiceList() {
+    public static String[] getTrackedEquipmentList() {
 
         return null;
     }
 
     //возвращает список устройств со статусами по определенной группе
-    public static String[] getDeviceListByGroup(String groupName) {
+    public static String[] getTrackedEquipmentListByGroup(String groupName) {
 
         return null;
     }
 
     //добавляет новое устройство в базу данных
-    public int addDevice(Device device) {
+    public int addTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         DeviceGroup deviceGroup = (DeviceGroup) session.createQuery("from DeviceGroup where title=:title")
@@ -45,12 +45,12 @@ public class DataBaseService {
         return -1;
     }
 
-    public Device getDeviceByUUID(String uuid) {
+    public TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
         session = factory.getCurrentSession();
         session.beginTransaction();
-        Device device = null;
+        TrackedEquipment device = null;
         try {
-            device = (Device) session.createQuery("from Device where UUID=:uuid").setParameter("uuid", uuid).getSingleResult();
+            device = (TrackedEquipment) session.createQuery("from TrackedEquipment where UUID=:uuid").setParameter("uuid", uuid).getSingleResult();
         } catch (NoResultException e) {
             session.getTransaction().commit();
             return null;
@@ -62,9 +62,9 @@ public class DataBaseService {
     public void changeDeviceStatus(String uuid, boolean status) {
         session = factory.getCurrentSession();
         session.beginTransaction();
-        Device device = null;
+        TrackedEquipment device = null;
         try {
-            device = (Device) session.createQuery("from Device where UUID=:uuid").setParameter("uuid", uuid).getSingleResult();
+            device = (TrackedEquipment) session.createQuery("from TrackedEquipment where UUID=:uuid").setParameter("uuid", uuid).getSingleResult();
             device.setOnlineStatus(status ? 1 : 0);
         } catch (NoResultException e) {
             session.getTransaction().commit();
@@ -74,14 +74,14 @@ public class DataBaseService {
     }
 
     //удаляет выбранное устройство из базы данных
-    public static int deleteDevice(Device device) {
+    public static int deleteTrackedEquipment(TrackedEquipment device) {
 
         return -1;
     }
 
     //изменяет статус устройства (мне кажется этот метод не понадобиться
     //так как после подключения hibernate наблюдает за объектами
-    public static int changeDeviceStatus(Device device) {
+    public static int changeTrackedEquipmentStatus(TrackedEquipment device) {
 
         return -1;
     }

@@ -12,6 +12,8 @@
         <module>DirServer</module>
         <module>Client</module>
         <module>api</module>
+        <module>GatewayService</module>
+        <module>UserManagementService</module>
     </modules>
 
     <properties>
