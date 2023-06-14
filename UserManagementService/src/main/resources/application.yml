@@ -10,7 +10,7 @@ spring:
           client-secret: ZnMtpRXWvGO3h4CSHAGmAtAanTfTAuri
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/netspectator
+    url: jdbc:postgresql://localhost:5432/ns-user-manage
     username: w0id
     password: 2311
   jpa:
