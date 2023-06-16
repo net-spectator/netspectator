@@ -1,7 +1,8 @@
 package entities;
 
 import entities.devices.ClientHardwareInfo;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
