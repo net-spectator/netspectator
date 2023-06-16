@@ -28,13 +28,6 @@ public class KeycloakService {
   private final String REALM = "netspectator";
   private Map<String, Object> attributes;
 
-
-  /*
-  * TODO
-  *  Проблема: При изменении аттрибутов в админке keycloak из UserRepresentations пропадают поля firstName и lastName.
-  *  После сохранения на вкладке Details в админке поля возвращают нужные значения.
-  *  При REST запросе, такой проблемы нет. Проблема явно на уровне Keycloak Admin Client.
-  */
   public List<UserRepresentation> getUsers() {
     return keycloak.realm(REALM).users().list();
   }
