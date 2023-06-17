@@ -1,0 +1,15 @@
+server:
+  port: ${IS_PORT:8080}
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${IS_DB_URL:localhost:5433}/${IS_DB_NAME:db_is}
+    username: ${IS_DB_USER:postgres}
+    password: ${IS_DB_PASSWORD:157456Lb}
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml

@@ -12,6 +12,7 @@
         <module>DirServer</module>
         <module>Client</module>
         <module>api</module>
+        <module>inventory-service</module>
     </modules>
 
     <properties>
