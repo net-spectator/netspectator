@@ -1,0 +1,28 @@
+server:
+  port: 9100
+#logging:
+#  level:
+#    root: debug
+#    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: trace
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: http://localhost:9500/realms/netspectator/protocol/openid-connect/token/introspect
+          client-id: javaclient
+          client-secret: ZnMtpRXWvGO3h4CSHAGmAtAanTfTAuri
+  cloud:
+    gateway:
+      redis:
+        enabled: false
+      routes:
+        - id: users
+          uri: http://localhost:9090
+          predicates:
+            - Path=/api/v1/users/**
+        - id: checkUser
+          uri: http://localhost:9090
+          predicates:
+            - Path=/api/v1/check/**
+introspect_field: sub

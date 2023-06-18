@@ -1,11 +1,7 @@
 package entities;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,6 +21,6 @@ public class DeviceGroup {
     private String title;
 
     @OneToMany(mappedBy = "deviceGroup", cascade = CascadeType.ALL)
-    private List<Device> device;
+    private List<TrackedEquipment> device;
 
 }
