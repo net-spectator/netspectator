@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Client {
@@ -146,13 +148,7 @@ public class Client {
                         executor.scheduleAtFixedRate(new DeviceListener(out), 0, 5, TimeUnit.SECONDS);
                         break;
                     case "getMac":
-                         NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
-                        StringBuilder sb = new StringBuilder();
-                        byte[] mac = network.getHardwareAddress();
-                        for (int i = 0; i < mac.length; i++) {
-                            sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                        }
-                        out.write(("\\macAddress " + sb).getBytes());
+                        out.write(("\\macAddress " + getMacAddress()).getBytes());
                         break;
                     case "close":
                         keepAlive = false;
@@ -161,6 +157,8 @@ public class Client {
             }
         } catch (IOException e) {
             LOGGER.error("Connection closed.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -194,9 +192,53 @@ public class Client {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-
         return computerName;
     }
 
+    public String getMacAddress() throws Exception {
+        try {
+            String macAddress = null;
+            String command = "ifconfig";
 
+            String osName = System.getProperty("os.name");
+//            System.out.println("Operating System is " + osName);
+
+            if (osName.startsWith("Windows")) {
+                command = "ipconfig /all";
+            } else if (osName.startsWith("Linux") || osName.startsWith("Mac") || osName.startsWith("HP-UX")
+                    || osName.startsWith("NeXTStep") || osName.startsWith("Solaris") || osName.startsWith("SunOS")
+                    || osName.startsWith("FreeBSD") || osName.startsWith("NetBSD")) {
+                command = "ifconfig -a";
+            } else if (osName.startsWith("OpenBSD")) {
+                command = "netstat -in";
+            } else if (osName.startsWith("IRIX") || osName.startsWith("AIX") || osName.startsWith("Tru64")) {
+                command = "netstat -ia";
+            } else if (osName.startsWith("Caldera") || osName.startsWith("UnixWare") || osName.startsWith("OpenUNIX")) {
+                command = "ndstat";
+            } else {// Note: Unsupported system.
+                throw new Exception("The current operating system '" + osName + "' is not supported.");
+            }
+
+            Process pid = Runtime.getRuntime().exec(command);
+            BufferedReader in = new BufferedReader(new InputStreamReader(pid.getInputStream()));
+            Pattern p = Pattern.compile("([\\w]{1,2}(-|:)){5}[\\w]{1,2}");
+            while (true) {
+                String line = in.readLine();
+//                System.out.println("line " + line);
+                if (line == null)
+                    break;
+
+                Matcher m = p.matcher(line);
+                if (m.find()) {
+                    macAddress = m.group();
+                    break;
+                }
+            }
+            in.close();
+            return macAddress;
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
