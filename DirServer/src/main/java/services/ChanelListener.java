@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static enums.Status.ONLINE;
+
 @RequiredArgsConstructor
 public class ChanelListener {
     private String uuid;
@@ -49,7 +51,7 @@ public class ChanelListener {
                     client.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
                     TrackedEquipment device = new TrackedEquipment(); //убрать этот момент, имя должно браться настоящее
-                    device.setTitle("Admin");
+                    device.setEquipmentTitle("Admin");
                     client.setDevice(device);
                 } else {
                     messageSender.sendMessageWithHeader("Wrong key");
@@ -76,18 +78,24 @@ public class ChanelListener {
                 ClientListenersDataBus.addConnection(client);
                 messageSender.sendMessageWithoutHeader("getName");
                 break;
-            case "/connections":
-                if (!connections.connectionListOperator(ctx, header)) {
-                    LOGGER.info("Bad command");
-                }
-                break;
             case "\\clientName":
                 LOGGER.info(String.format("Имя клиента: [%s]", header[1]));
                 deviceInit(ctx, header);
+                messageSender.sendMessageWithoutHeader("getMac");
+                break;
+            case "\\macAddress":
+                LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
+                client.getDevice().setEquipmentMacAddress(header[1]);
+                dbService.updateTrackedEquipment(client.getDevice());
                 messageSender.sendMessageWithoutHeader("startSensors");
                 break;
             case "/shutdown":
                 server.shutdown();
+                break;
+            case "/connections":
+                if (!connections.connectionListOperator(ctx, header)) {
+                    LOGGER.info("Bad command");
+                }
                 break;
             case "/disabledList":
                 if (!blackList.disabledClientsListOperator(header)) {
@@ -105,17 +113,18 @@ public class ChanelListener {
     }
 
     private void deviceInit(ChannelHandlerContext ctx, String[] args) {
-        TrackedEquipment device = dbService.getTrackedEquipmentByUUID(uuid);
+        TrackedEquipment device = dbService.getTrackedEquipmentByUUID(uuid);  // TODO: 19.06.2023 проверка уникальности клиента должна осуществляться по ip, mac и UUID
         if (device == null) {
             device = new TrackedEquipment();
-            device.setTitle(args[1]);
-            device.setUUID(uuid);
+            device.setEquipmentTitle(args[1]);
+            device.setEquipmentUuid(uuid);
             LOGGER.info(dbService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
         }
-        dbService.changeDeviceStatus(uuid, true);
-        device.setIp(ctx.channel().localAddress()
+        device.setEquipmentOnlineStatus(ONLINE.toString());
+        device.setEquipmentIpAddress(ctx.channel().localAddress()
                 .toString()
                 .replace("/", ""));
+        dbService.updateTrackedEquipment(device);
         client.setDevice(device);
     }
 }

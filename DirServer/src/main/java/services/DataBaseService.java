@@ -1,7 +1,6 @@
 package services;
 
 import entities.TrackedEquipment;
-import entities.DeviceGroup;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -37,9 +36,9 @@ public class DataBaseService {
     public int addTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
         session.beginTransaction();
-        DeviceGroup deviceGroup = (DeviceGroup) session.createQuery("from DeviceGroup where title=:title")
-                .setParameter("title","main").getSingleResult();
-        device.setDeviceGroup(deviceGroup);
+//        DeviceGroup deviceGroup = (DeviceGroup) session.createQuery("from DeviceGroup where title=:title")
+//                .setParameter("title","main").getSingleResult();
+//        device.setDeviceGroup(deviceGroup);
         session.save(device);
         session.getTransaction().commit();
         return -1;
@@ -50,7 +49,7 @@ public class DataBaseService {
         session.beginTransaction();
         TrackedEquipment device = null;
         try {
-            device = (TrackedEquipment) session.createQuery("from TrackedEquipment where UUID=:uuid").setParameter("uuid", uuid).getSingleResult();
+            device = (TrackedEquipment) session.createQuery("from TrackedEquipment where equipmentUuid=:uuid").setParameter("uuid", uuid).getSingleResult();
         } catch (NoResultException e) {
             session.getTransaction().commit();
             return null;
@@ -64,12 +63,19 @@ public class DataBaseService {
         session.beginTransaction();
         TrackedEquipment device = null;
         try {
-            device = (TrackedEquipment) session.createQuery("from TrackedEquipment where UUID=:uuid").setParameter("uuid", uuid).getSingleResult();
-            device.setOnlineStatus(status ? 1 : 0);
+            device = (TrackedEquipment) session.createQuery("from TrackedEquipment where equipmentUuid=:uuid").setParameter("uuid", uuid).getSingleResult();
+            device.setEquipmentOnlineStatus(status ? "1" : "0"); // TODO: 18.06.2023 поправить тип данных
         } catch (NoResultException e) {
             session.getTransaction().commit();
             return;
         }
+        session.getTransaction().commit();
+    }
+
+    public void updateTrackedEquipment(TrackedEquipment device){
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        session.update(device);
         session.getTransaction().commit();
     }
 

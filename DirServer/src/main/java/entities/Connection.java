@@ -15,7 +15,7 @@ public class Connection{
 
     @Override
     public String toString() {
-        return (device != null ? device.getTitle() : "NULL") + ": " + channelHandlerContext;
+        return (device != null ? device.getEquipmentTitle() : "NULL") + ": " + channelHandlerContext;
     }
 
     public void closeConnection() {

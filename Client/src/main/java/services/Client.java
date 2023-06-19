@@ -6,10 +6,7 @@ import config.Logo;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.Inet4Address;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -147,6 +144,15 @@ public class Client {
                         break;
                     case "startSensors":
                         executor.scheduleAtFixedRate(new DeviceListener(out), 0, 5, TimeUnit.SECONDS);
+                        break;
+                    case "getMac":
+                         NetworkInterface network = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+                        StringBuilder sb = new StringBuilder();
+                        byte[] mac = network.getHardwareAddress();
+                        for (int i = 0; i < mac.length; i++) {
+                            sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                        }
+                        out.write(("\\macAddress " + sb).getBytes());
                         break;
                     case "close":
                         keepAlive = false;

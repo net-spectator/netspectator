@@ -3,35 +3,50 @@ package entities;
 import entities.devices.ClientHardwareInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
-@Data
-@NoArgsConstructor
 @Entity
+@Data
 @Table(name = "tracked_equipment")
 public class TrackedEquipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @Basic
-    private int id;
-    @Column
-    private String UUID;
-    @Column
-    private String title;
-    @Column
-    private String ip;
+    private Long id;
+
+    @Column(name = "uuid")
+    private String equipmentUuid;
+
+    @Column(name = "title")
+    private String equipmentTitle;
+
+    @Column(name = "ip")
+    private String equipmentIpAddress;
+
     @Column(name = "online_status")
-    private int onlineStatus;
-    @Column
-    private String macAddress;
-    @Column(name = "tracked_status")
+    private String equipmentOnlineStatus;
+
+    @Column(name = "mac_address")
+    private String equipmentMacAddress;
+
+    @Column(name = "black_list", columnDefinition = "integer default 0")
     private int blackList;
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private DeviceGroup deviceGroup;
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "trackedEquipment", cascade = CascadeType.ALL)
+    private List<TrackedEquipmentSensors> trackedEquipmentSensorsList;
     @Transient
     private ClientHardwareInfo deviceInfo;
 }
