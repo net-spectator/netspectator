@@ -19,4 +19,5 @@ public class UserActualizeController {
     public void checkUser(BearerTokenAuthentication auth) {
         userActualizeService.checkUser(auth);
     }
+
 }

@@ -18,3 +18,17 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 #    hibernate:
 #      ddl-auto: create
+  task:
+    scheduling:
+      pool:
+        size: 5
+check-delay: 60000
+realm: netspectator
+keycloak:
+  management:
+    props:
+      server-url: http://localhost:9500/
+      master-realm: master
+      username: ns-reader
+      password: 2311
+      client-id: admin-cli
