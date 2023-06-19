@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,17 +25,17 @@ public class KeycloakService {
   private final RoleService roleService;
   private final UserActualizeService userActualizeService;
 
-  //TODO вынести в конфиг
-  private final String REALM = "netspectator";
+  @Value("${realm}")
+  private String realm;
   private Map<String, Object> attributes;
 
   public List<UserRepresentation> getUsers() {
-    return keycloak.realm(REALM).users().list();
+    return keycloak.realm(realm).users().list();
   }
 
   public List<Role> getMappedRoles(String id) {
     List<RoleRepresentation> roleRepresentations = keycloak
-            .realm(REALM)
+            .realm(realm)
             .users()
             .get(id)
             .roles()
@@ -49,7 +50,7 @@ public class KeycloakService {
     return auth;
   }
 
-  @Scheduled(fixedDelay = 30000) // TODO Вынести значение fixedDelay в конфиг
+  @Scheduled(fixedDelayString = "${check-delay}")
   public void autocheckUsers() {
     getUsers().stream().forEach(userRepresentation -> {
       attributes = null;

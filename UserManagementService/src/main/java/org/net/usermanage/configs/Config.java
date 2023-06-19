@@ -1,23 +1,32 @@
 package org.net.usermanage.configs;
 
+import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.net.usermanage.properties.KeycloakManageProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableConfigurationProperties(
+        KeycloakManageProperty.class
+)
+@RequiredArgsConstructor
 public class Config {
 
-  //TODO вынести в конфиг
+  private final KeycloakManageProperty property;
+
+
   @Bean
   public Keycloak keycloak() {
     return KeycloakBuilder.builder()
-        .serverUrl("http://localhost:9500/")
-        .realm("master")
-        .username("ns-reader")
-        .password("2311")
-        .clientId("admin-cli")
+        .serverUrl(property.getServerUrl())
+        .realm(property.getMasterRealm())
+        .username(property.getUsername())
+        .password(property.getPassword())
+        .clientId(property.getClientId())
         .grantType(OAuth2Constants.PASSWORD)
         .build();
   }
