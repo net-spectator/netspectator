@@ -33,17 +33,16 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        dbService.changeDeviceStatus(client.getDevice().getUUID(), false);
-        if (ClientListenersDataBus.removeConnection(client)) {
-            LOGGER.info(String.format("Client [%s] successfully removed", client.getDevice().getTitle()));
-            LOGGER.info(String.format("Client [%s] disconnected", client.getDevice().getTitle()));
+        dbService.changeDeviceStatus(client.getDevice().getEquipmentUuid(), false);
+        if (ClientListenersDataBus.disconnectClient(client)) {
+            LOGGER.info(String.format("Client [%s] successfully removed", client.getDevice().getEquipmentTitle()));
+            LOGGER.info(String.format("Client [%s] disconnected", client.getDevice().getEquipmentTitle()));
         }
-        LOGGER.info(String.format("Error with [%s] disconnection", client.getDevice().getTitle()));
+        LOGGER.info(String.format("Error with [%s] disconnection", client.getDevice().getEquipmentTitle()));
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
         chanelListener.listen(ctx, msg);
     }
 
