@@ -149,5 +149,4 @@ public class ClientListenersDataBus {
         Connection connection = connections.get(index);
         return connection.getDevice().getDeviceInfo();
     }
-
 }

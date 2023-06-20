@@ -145,7 +145,9 @@ public class Client {
                         out.write(("\\clientName " + clientParams.get("Client name")).getBytes());
                         break;
                     case "startSensors":
-                        executor.scheduleAtFixedRate(new DeviceListener(out), 0, 5, TimeUnit.SECONDS);
+                        if (query.length >= 2) {
+                            executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), 0, 5, TimeUnit.SECONDS);
+                        }
                         break;
                     case "getMac":
                         out.write(("\\macAddress " + getMacAddress()).getBytes());
@@ -236,7 +238,7 @@ public class Client {
             }
             in.close();
             return macAddress;
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

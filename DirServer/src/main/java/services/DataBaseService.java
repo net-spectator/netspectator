@@ -7,7 +7,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 
+import javax.persistence.EntityGraph;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 @Transactional
@@ -43,7 +45,7 @@ public class DataBaseService {
         session.getTransaction().commit();
         return -1;
     }
-
+    @Transactional
     public TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
         session = factory.getCurrentSession();
         session.beginTransaction();
