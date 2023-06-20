@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.devices.ClientHardwareInfo;
 import entities.devices.Hardware;
+import entities.devices.Ram;
+import entities.devices.cpus.Cpu;
 import entities.devices.drives.Drive;
 import readers.DriveInfoCollector;
 import readers.SensorInfoCollector;
@@ -23,10 +25,10 @@ public class DeviceListener implements Runnable {
 
     private final DataOutputStream out;
 
-    public DeviceListener(DataOutputStream out) {
+    public DeviceListener(DataOutputStream out, String[] sensorsListFromServer) {
         sensors = new HashMap<>();
         this.out = out;
-        sensors.put(castClass("readers.DriveInfoCollector").getClass().getSimpleName(),castClass("readers.DriveInfoCollector")); //временный вариант
+        Arrays.stream(sensorsListFromServer).forEach(this::createSensors);
     }
 
     private void updateSensorsStatement() {
@@ -36,16 +38,8 @@ public class DeviceListener implements Runnable {
     @Override
     public void run() { //ToDo доработать автоматическое создание сенсоров
         updateSensorsStatement();
-        ClientHardwareInfo chi = new ClientHardwareInfo();
-        chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json;
-        try {
-            json = objectMapper.writeValueAsString(chi);
-            out.write(("\\" + chi.getClass().getSimpleName() + " " + json).getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        ClientHardwareInfo chi = clientHardwareInfoInit();
+        sendClientHardwareInfoToServer(chi);
     }
 
     public <T> List<T> castList(Class<? extends T> clazz, Collection<?> rawCollection) {
@@ -67,5 +61,30 @@ public class DeviceListener implements Runnable {
             throw new RuntimeException(e);
         }
         return (SensorInfoCollector) testClass;
+    }
+
+    private void createSensors(String sensorName) {
+        sensors.put(castClass("readers." + sensorName)
+                .getClass()
+                .getSimpleName(),
+                castClass("readers." + sensorName));
+    }
+
+    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo){
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(clientHardwareInfo);
+            out.write(("\\" + clientHardwareInfo.getClass().getSimpleName() + " " + json).getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ClientHardwareInfo clientHardwareInfoInit(){
+        ClientHardwareInfo chi = new ClientHardwareInfo();
+        chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
+        chi.setCpus(castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
+        return chi;
     }
 }

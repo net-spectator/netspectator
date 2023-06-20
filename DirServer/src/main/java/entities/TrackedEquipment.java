@@ -4,6 +4,8 @@ import entities.devices.ClientHardwareInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -45,6 +47,7 @@ public class TrackedEquipment {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+    @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "trackedEquipment", cascade = CascadeType.ALL)
     private List<TrackedEquipmentSensors> trackedEquipmentSensorsList;
     @Transient
