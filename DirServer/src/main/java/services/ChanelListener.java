@@ -2,9 +2,7 @@ package services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Connection;
-import entities.Sensors;
 import entities.TrackedEquipment;
-import entities.TrackedEquipmentSensors;
 import entities.devices.ClientHardwareInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,11 +13,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static enums.Status.ONLINE;
 
@@ -28,9 +22,9 @@ public class ChanelListener {
     private String uuid;
     private final MessageSender messageSender;
     private final ConnectionsList connections;
-    private final DisabledClients blackList;
+    private final DisabledClientsControl blackList;
     private final Connection client;
-    private final Server server;
+    private final ServerControl server;
     private final DataBaseService dbService;
     private static final Logger LOGGER = Logger.getLogger(ChanelListener.class);
 
@@ -133,7 +127,7 @@ public class ChanelListener {
             device.setEquipmentUuid(uuid);
             LOGGER.info(dbService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
         }
-        device.setEquipmentOnlineStatus(ONLINE.toString());
+        device.setEquipmentOnlineStatus(ONLINE.getStatus());
         device.setEquipmentIpAddress(ctx.channel().localAddress()
                 .toString()
                 .replace("/", ""));

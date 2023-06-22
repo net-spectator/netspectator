@@ -1,6 +1,7 @@
 package services;
 
 import entities.Connection;
+import entities.TrackedEquipment;
 import entities.devices.ClientHardwareInfo;
 
 import java.net.SocketAddress;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class ClientListenersDataBus {
     private static volatile ClientListenersDataBus nettyDataBus;
@@ -124,6 +126,25 @@ public class ClientListenersDataBus {
     }
 
     /**
+     * отключение клиента по device_id
+     */
+    public static boolean disconnectClient(long deviceId) {
+        try {
+            Connection removedConnection = connections
+                    .stream()
+                    .filter(connection -> connection.getDevice().getId().equals(deviceId))
+                    .findAny()
+                    .orElse(null);
+            assert removedConnection != null;
+            removedConnection.closeConnection();
+            connections.remove(removedConnection);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * Отключение клиента по объекту Connection
      */
     public static boolean disconnectClient(Connection connection) {
@@ -144,9 +165,15 @@ public class ClientListenersDataBus {
 
     /**
      * Возвращает текущую информацию о клиенте и состояние всех его сенсоров
-     * */
-    public static ClientHardwareInfo getClientHardwareInfo(int index) {
-        Connection connection = connections.get(index);
-        return connection.getDevice().getDeviceInfo();
+     */
+    public static ClientHardwareInfo getClientHardwareInfo(long deviceId) {
+        Connection result = connections
+                .stream()
+                .filter(connection -> connection.getDevice().getId().equals(deviceId))
+                .findAny()
+                .orElse(null);
+        assert result != null;
+        TrackedEquipment te = result.getDevice();
+        return te.getDeviceInfo();
     }
 }

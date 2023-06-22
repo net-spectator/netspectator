@@ -50,8 +50,8 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
         client = new Connection(ctx);
         dbService = new DataBaseService();
         MessageSender messageSender = new MessageSender(ctx, client);
-        DisabledClients blackList = new DisabledClients(messageSender, client);
-        Server server = new Server(messageSender, client);
+        DisabledClientsControl blackList = new DisabledClientsControl(messageSender, client);
+        ServerControl server = new ServerControl(messageSender, client);
         ConnectionsList connectionsList = new ConnectionsList(messageSender, blackList, client);
         chanelListener = new ChanelListener(messageSender, connectionsList, blackList, client, server, dbService);
     }

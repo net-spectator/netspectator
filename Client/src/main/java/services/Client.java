@@ -32,6 +32,8 @@ public class Client {
     private int PORT;
     private boolean isInteractive;
     private ScheduledExecutorService executor;
+    private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
+    private static long PERIOD =5; // TODO: 22.06.2023 перенести в clientParams
     private static final Logger LOGGER = Logger.getLogger(Client.class);
 
     public static String getClientParams(String param) {
@@ -146,7 +148,7 @@ public class Client {
                         break;
                     case "startSensors":
                         if (query.length >= 2) {
-                            executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), 0, 5, TimeUnit.SECONDS);
+                            executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
                         }
                         break;
                     case "getMac":
@@ -159,6 +161,7 @@ public class Client {
             }
         } catch (IOException e) {
             LOGGER.error("Connection closed.");
+            executor.shutdown();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -32,7 +32,7 @@ public class TrackedEquipment {
     private String equipmentIpAddress;
 
     @Column(name = "online_status")
-    private String equipmentOnlineStatus;
+    private Integer equipmentOnlineStatus;
 
     @Column(name = "mac_address")
     private String equipmentMacAddress;

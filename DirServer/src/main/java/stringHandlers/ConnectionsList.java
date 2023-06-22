@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionsList {
     private final MessageSender messageSender;
-    private final DisabledClients blackList;
+    private final DisabledClientsControl blackList;
     private final Connection client;
 
-    public ConnectionsList(MessageSender messageSender, DisabledClients blackList, Connection client) {
+    public ConnectionsList(MessageSender messageSender, DisabledClientsControl blackList, Connection client) {
         this.messageSender = messageSender;
         this.blackList = blackList;
         this.client = client;
