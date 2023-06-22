@@ -2,6 +2,7 @@ package org.net.webcoreservice.service;
 
 import entities.devices.ClientHardwareInfo;
 import lombok.RequiredArgsConstructor;
+import org.net.webcoreservice.Enum.BlackListStatus;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
 import org.net.webcoreservice.entities.TrackedEquipment;
 import org.net.webcoreservice.repository.TrackedEquipmentRepository;
@@ -34,12 +35,12 @@ public class TrackedEquipmentService {
     }
 
     public void addToBlackList(Long id) {
-        blackListOperation(id, 1);
+        blackListOperation(id, BlackListStatus.DISABLE.getStatus());
         disconnect(id);
     }
 
     public void removeFromBlackList(Long id) {
-        blackListOperation(id, 0);
+        blackListOperation(id, BlackListStatus.ENABLE.getStatus());
     }
 
     public void disconnect(Long id) {
