@@ -1,13 +1,11 @@
 package services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.devices.ClientHardwareInfo;
 import entities.devices.Hardware;
-import entities.devices.Ram;
+import entities.devices.ram.Ram;
 import entities.devices.cpus.Cpu;
 import entities.devices.drives.Drive;
-import readers.DriveInfoCollector;
 import readers.SensorInfoCollector;
 
 import java.io.DataOutputStream;
@@ -16,7 +14,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DeviceListener implements Runnable {
@@ -36,7 +33,7 @@ public class DeviceListener implements Runnable {
     }
 
     @Override
-    public void run() { //ToDo доработать автоматическое создание сенсоров
+    public void run() {
         updateSensorsStatement();
         ClientHardwareInfo chi = clientHardwareInfoInit();
         sendClientHardwareInfoToServer(chi);
@@ -65,12 +62,12 @@ public class DeviceListener implements Runnable {
 
     private void createSensors(String sensorName) {
         sensors.put(castClass("readers." + sensorName)
-                .getClass()
-                .getSimpleName(),
+                        .getClass()
+                        .getSimpleName(),
                 castClass("readers." + sensorName));
     }
 
-    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo){
+    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) {
         ObjectMapper objectMapper = new ObjectMapper();
         String json;
         try {
@@ -81,10 +78,21 @@ public class DeviceListener implements Runnable {
         }
     }
 
-    private ClientHardwareInfo clientHardwareInfoInit(){
+    private ClientHardwareInfo clientHardwareInfoInit() {
         ClientHardwareInfo chi = new ClientHardwareInfo();
-        chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
-        chi.setCpus(castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
+        sensors.forEach((key, value) -> {
+            switch (key) {
+                case "DriveInfoCollector":
+                    chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
+                    break;
+                case "CpuInfoCollector":
+                    chi.setCpus(castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
+                    break;
+                case "RamInfoCollector":
+                    chi.setRam(castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()));
+                    break;
+            }
+        });
         return chi;
     }
 }

@@ -3,15 +3,18 @@ package stringHandlers;
 import entities.Connection;
 import services.ClientListenersStarter;
 
-public class Server {
+public class ServerControl {
     private final MessageSender messageSender;
     private final Connection client;
 
-    public Server(MessageSender messageSender, Connection client) {
+    public ServerControl(MessageSender messageSender, Connection client) {
         this.messageSender = messageSender;
         this.client = client;
     }
 
+    /**
+     * Завершает работу сервера клиентов
+     * */
     public void shutdown() {
         if (client.isAuth()) {
             messageSender.sendMessageWithoutHeader("Server shutdown");

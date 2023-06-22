@@ -65,3 +65,11 @@ public final class ClientListenersStarter {
         worker.shutdownGracefully();
     }
 }
+
+// TODO: 22.06.2023 подкорректировать базу данных
+/**
+ * router
+ * printer
+ * server
+ * workstation
+ * */

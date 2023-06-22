@@ -5,12 +5,12 @@ import services.ClientListenersDataBus;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DisabledClients {
+public class DisabledClientsControl {
     private final MessageSender messageSender;
 
     private final Connection client;
 
-    public DisabledClients(MessageSender messageSender, Connection client) {
+    public DisabledClientsControl(MessageSender messageSender, Connection client) {
         this.messageSender = messageSender;
         this.client = client;
     }
