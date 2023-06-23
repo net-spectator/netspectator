@@ -2,6 +2,8 @@ package org.net.webcoreservice.entities;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,6 +23,7 @@ public class Sensors {
     @NotNull
     private String sensorTitle;
 
+    @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "sensors", cascade = CascadeType.ALL)
     private List<TrackedEquipmentSensors> trackedEquipmentSensorsList;
 }

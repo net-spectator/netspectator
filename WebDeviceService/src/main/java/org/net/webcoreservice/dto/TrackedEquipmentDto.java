@@ -8,6 +8,6 @@ public class TrackedEquipmentDto {
     private String uuid;
     private String title;
     private String ip;
-    private String onlineStatus;
+    private int onlineStatus;
     private String mac;
 }

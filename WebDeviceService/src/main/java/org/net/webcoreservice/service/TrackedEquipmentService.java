@@ -1,10 +1,13 @@
 package org.net.webcoreservice.service;
 
+import entities.devices.ClientHardwareInfo;
 import lombok.RequiredArgsConstructor;
+import org.net.webcoreservice.Enum.BlackListStatus;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
 import org.net.webcoreservice.entities.TrackedEquipment;
 import org.net.webcoreservice.repository.TrackedEquipmentRepository;
 import org.springframework.stereotype.Service;
+import services.ClientListenersDataBus;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,27 @@ public class TrackedEquipmentService {
         trackedEquipmentRepository.deleteById(id);
     }
 
+    public List<TrackedEquipment> showBlackList() {
+        return trackedEquipmentRepository.showBlackList();
+    }
+
+    public void addToBlackList(Long id) {
+        blackListOperation(id, BlackListStatus.DISABLE.getStatus());
+        disconnect(id);
+    }
+
+    public void removeFromBlackList(Long id) {
+        blackListOperation(id, BlackListStatus.ENABLE.getStatus());
+    }
+
+    public void disconnect(Long id) {
+        ClientListenersDataBus.disconnectClient(id);
+    }
+
+    public ClientHardwareInfo getEquipmentHardwareInfo(Long id) {
+        return ClientListenersDataBus.getClientHardwareInfo(id);
+    }
+
     public void createNewTrackedEquipment(TrackedEquipmentDto trackedEquipmentDto) {
         TrackedEquipment trackedEquipment = new TrackedEquipment();
         trackedEquipment.setEquipmentUuid(trackedEquipmentDto.getUuid());
@@ -35,5 +59,19 @@ public class TrackedEquipmentService {
         trackedEquipment.setEquipmentOnlineStatus(trackedEquipmentDto.getOnlineStatus());
         trackedEquipment.setEquipmentMacAddress(trackedEquipmentDto.getMac());
         trackedEquipmentRepository.save(trackedEquipment);
+    }
+
+    public void blackListOperation(Long id, int blackListStatus) {
+        TrackedEquipment trackedEquipment = findById(id).get();
+        trackedEquipment.setBlackList(blackListStatus);
+        trackedEquipmentRepository.save(trackedEquipment);
+    }
+
+    public boolean isExist(Long id) {
+        Optional<TrackedEquipment> entity = findById(id);
+        if (!entity.isPresent()) {
+            return false;
+        }
+        return true;
     }
 }

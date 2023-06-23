@@ -2,6 +2,8 @@ package org.net.webcoreservice.entities;
 
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -28,7 +30,7 @@ public class TrackedEquipment {
     private String equipmentIpAddress;
 
     @Column(name = "online_status")
-    private String equipmentOnlineStatus;
+    private int equipmentOnlineStatus;
 
     @Column(name = "mac_address")
     private String equipmentMacAddress;
@@ -44,6 +46,11 @@ public class TrackedEquipment {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "type")
+    private EquipmentType typeId;
+
+    @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "trackedEquipment", cascade = CascadeType.ALL)
     private List<TrackedEquipmentSensors> trackedEquipmentSensorsList;
 
