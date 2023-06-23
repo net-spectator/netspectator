@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <include file="accounting/registration_number.xml" relativeToChangelogFile="true"/>
+    <include file="devices/type_materials.xml" relativeToChangelogFile="true"/>
+    <include file="devices/vendors.xml" relativeToChangelogFile="true"/>
+    <include file="devices/devices.xml" relativeToChangelogFile="true"/>
+    <include file="devices/materials.xml" relativeToChangelogFile="true"/>
+    <include file="places/places.xml" relativeToChangelogFile="true"/>
+    <include file="accounting/registration_events.xml" relativeToChangelogFile="true"/>
+    <include file="accounting/registration_status.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

@@ -3,6 +3,7 @@ package entities.devices;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import entities.devices.cpus.Cpu;
 import entities.devices.drives.Drive;
+import entities.devices.ram.Ram;
 import lombok.Data;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class ClientHardwareInfo {
     @JsonProperty("cpus")
     private List<Cpu> cpus;
     @JsonProperty("ram")
-    private Ram ram;
+    private List<Ram> ram;
     @JsonProperty("drives")
     private List<Drive> drives;
 }

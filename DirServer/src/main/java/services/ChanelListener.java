@@ -2,9 +2,8 @@ package services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Connection;
-import entities.Device;
+import entities.TrackedEquipment;
 import entities.devices.ClientHardwareInfo;
-import entities.devices.drives.Drive;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,14 +15,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static enums.Status.ONLINE;
+
 @RequiredArgsConstructor
 public class ChanelListener {
     private String uuid;
     private final MessageSender messageSender;
     private final ConnectionsList connections;
-    private final BlackList blackList;
+    private final DisabledClientsControl blackList;
     private final Connection client;
-    private final Server server;
+    private final ServerControl server;
     private final DataBaseService dbService;
     private static final Logger LOGGER = Logger.getLogger(ChanelListener.class);
 
@@ -46,22 +47,22 @@ public class ChanelListener {
                 messageSender.sendMessageWithHeader("Welcome to Net Spectator server. ");
                 break;
             case "/auth":
-                if (header.length > 1 && header[1].equals(NettyBootstrap.serverParams.get("admin"))) {
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("admin"))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
-                    Device device = new Device(); //убрать этот момент, имя должно браться настоящее
-                    device.setTitle("Admin");
+                    TrackedEquipment device = new TrackedEquipment(); //убрать этот момент, имя должно браться настоящее
+                    device.setEquipmentTitle("Admin");
                     client.setDevice(device);
                 } else {
                     messageSender.sendMessageWithHeader("Wrong key");
                 }
                 break;
             case "\\auth":
-                if (header.length > 1 && header[1].equals(NettyBootstrap.serverParams.get("publicKey"))) {
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("publicKey"))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithoutHeader("getId");
                 } else {
-                    NettyBootstrap.blackList.add(ctx.channel().localAddress());
+                    ClientListenersDataBus.disableClient(ctx.channel().localAddress());
                     ctx.disconnect();
                 }
                 break;
@@ -74,30 +75,44 @@ public class ChanelListener {
                 } else {
                     uuid = header[1];
                 }
+                ClientListenersDataBus.addConnection(client);
                 messageSender.sendMessageWithoutHeader("getName");
+                break;
+            case "\\clientName":
+                LOGGER.info(String.format("Имя клиента: [%s]", header[1]));
+                deviceInit(ctx, header);
+                messageSender.sendMessageWithoutHeader("getMac");
+                break;
+            case "\\macAddress":
+                LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
+                client.getDevice().setEquipmentMacAddress(header[1]);
+                dbService.updateTrackedEquipment(client.getDevice());
+                StringBuilder sensors = new StringBuilder();
+                client.getDevice()
+                        .getTrackedEquipmentSensorsList()
+                        .forEach(trackedEquipmentSensors -> sensors.append(" ")
+                                .append(trackedEquipmentSensors
+                                        .getSensors()
+                                        .getSensorTitle()));
+                messageSender.sendMessageWithoutHeader("startSensors" + sensors);
+                break;
+            case "/shutdown":
+                server.shutdown();
                 break;
             case "/connections":
                 if (!connections.connectionListOperator(ctx, header)) {
                     LOGGER.info("Bad command");
                 }
                 break;
-            case "\\clientName":
-                LOGGER.info(String.format("Имя клиента: [%s]", header[1]));
-                deviceInit(ctx, header);
-                messageSender.sendMessageWithoutHeader("startSensors");
-                break;
-            case "/shutdown":
-                server.shutdown();
-                break;
-            case "/blacklist":
-                if (!blackList.blackListOperator(header)) {
+            case "/disabledList":
+                if (!blackList.disabledClientsListOperator(header)) {
                     LOGGER.info("Bad command");
                 }
                 break;
             case "\\ClientHardwareInfo":  //в процессе доработки
                 ObjectMapper mapper = new ObjectMapper();
-                ClientHardwareInfo drive = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
-                System.out.println(drive);
+                ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
+                client.getDevice().setDeviceInfo(deviceInfo);
             default:
                 messageSender.sendMessageWithHeader("Unknown command");
                 break;
@@ -105,17 +120,18 @@ public class ChanelListener {
     }
 
     private void deviceInit(ChannelHandlerContext ctx, String[] args) {
-        Device device = dbService.getDeviceByUUID(uuid);
+        TrackedEquipment device = dbService.getTrackedEquipmentByUUID(uuid);  // TODO: 19.06.2023 проверка уникальности клиента должна осуществляться по ip, mac и UUID
         if (device == null) {
-            device = new Device();
-            device.setTitle(args[1]);
-            device.setUUID(uuid);
-            LOGGER.info(dbService.addDevice(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
+            device = new TrackedEquipment();
+            device.setEquipmentTitle(args[1]);
+            device.setEquipmentUuid(uuid);
+            LOGGER.info(dbService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
         }
-        dbService.changeDeviceStatus(uuid, true);
-        device.setIp(ctx.channel().localAddress()
+        device.setEquipmentOnlineStatus(ONLINE.getStatus());
+        device.setEquipmentIpAddress(ctx.channel().localAddress()
                 .toString()
                 .replace("/", ""));
+        dbService.updateTrackedEquipment(device);
         client.setDevice(device);
     }
 }

@@ -2,17 +2,17 @@ package stringHandlers;
 
 import entities.Connection;
 import io.netty.channel.ChannelHandlerContext;
-import services.NettyBootstrap;
+import services.ClientListenersDataBus;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionsList {
     private final MessageSender messageSender;
-    private final BlackList blackList;
+    private final DisabledClientsControl blackList;
     private final Connection client;
 
-    public ConnectionsList(MessageSender messageSender, BlackList blackList, Connection client) {
+    public ConnectionsList(MessageSender messageSender, DisabledClientsControl blackList, Connection client) {
         this.messageSender = messageSender;
         this.blackList = blackList;
         this.client = client;
@@ -34,22 +34,19 @@ public class ConnectionsList {
         switch (args[1]) {
             case "show":
                 AtomicInteger finalIndex = new AtomicInteger(1);
-                NettyBootstrap.connections.forEach(socketAddress -> response
+                ClientListenersDataBus.getConnectionsList().forEach(socketAddress -> response
                         .append(finalIndex.getAndIncrement())
                         .append(". ")
                         .append(socketAddress)
                         .append("\n"));
-                messageSender.sendMessageWithHeader(response.toString());
+                messageSender.sendMessageWithHeader(response.length() < 1 ? "empty" : response.toString());
                 return true;
 
             case "close":
                 int index = 0;
                 try {
                     index = Integer.parseInt(args[2]);
-                    NettyBootstrap.connections.get(index - 1)
-                            .getChannelHandlerContext()
-                            .disconnect();
-                    NettyBootstrap.connections.remove(index - 1);
+                    ClientListenersDataBus.disconnectClient(index-1);
                 } catch (NumberFormatException e) {
                     messageSender.sendMessageWithHeader("Wrong index format");
                     return false;
@@ -59,8 +56,8 @@ public class ConnectionsList {
                 }
                 messageSender.sendMessageWithHeader("Operation complete");
                 return true;
-            case "blacklist":
-                return blackList.blackListOperator(Arrays.copyOfRange(args, 1, args.length));
+            case "disabledList":
+                return blackList.disabledClientsListOperator(Arrays.copyOfRange(args, 1, args.length));
             case "this":
                 messageSender.sendMessageWithHeader(ctx.channel().remoteAddress().toString());
                 return true;

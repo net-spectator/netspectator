@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IniFileOperator {
+public class IniFileOperator { // TODO: 19.06.2023 вынести этот класс в api для сервера и клиента
     public static HashMap<String, String> initFileParams(String fileName) {
         HashMap<String, String> params = new HashMap<>();
         File iniFile = new File(fileName);
@@ -28,7 +28,7 @@ public class IniFileOperator {
         return params.size() > 0 ? params : null;
     }
 
-    public synchronized static void writeFileParams(HashMap<String, String> params) {
+    public synchronized static void writeFileParams(HashMap<String, String> params) { // TODO: 19.06.2023 добавить сигнатуру имени файла
         File file = new File("client.ini");
         try (FileOutputStream fis = new FileOutputStream(file);
              BufferedWriter writer = new BufferedWriter((new OutputStreamWriter(fis, StandardCharsets.UTF_8)));) {

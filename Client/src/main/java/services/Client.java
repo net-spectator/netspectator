@@ -6,10 +6,7 @@ import config.Logo;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.Inet4Address;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -19,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Client {
@@ -33,6 +32,8 @@ public class Client {
     private int PORT;
     private boolean isInteractive;
     private ScheduledExecutorService executor;
+    private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
+    private static long PERIOD =5; // TODO: 22.06.2023 перенести в clientParams
     private static final Logger LOGGER = Logger.getLogger(Client.class);
 
     public static String getClientParams(String param) {
@@ -146,7 +147,12 @@ public class Client {
                         out.write(("\\clientName " + clientParams.get("Client name")).getBytes());
                         break;
                     case "startSensors":
-                        executor.scheduleAtFixedRate(new DeviceListener(out), 0, 5, TimeUnit.SECONDS);
+                        if (query.length >= 2) {
+                            executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+                        }
+                        break;
+                    case "getMac":
+                        out.write(("\\macAddress " + getMacAddress()).getBytes());
                         break;
                     case "close":
                         keepAlive = false;
@@ -155,6 +161,9 @@ public class Client {
             }
         } catch (IOException e) {
             LOGGER.error("Connection closed.");
+            executor.shutdown();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -188,9 +197,53 @@ public class Client {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-
         return computerName;
     }
 
+    public String getMacAddress() throws Exception {
+        try {
+            String macAddress = null;
+            String command = "ifconfig";
 
+            String osName = System.getProperty("os.name");
+//            System.out.println("Operating System is " + osName);
+
+            if (osName.startsWith("Windows")) {
+                command = "ipconfig /all";
+            } else if (osName.startsWith("Linux") || osName.startsWith("Mac") || osName.startsWith("HP-UX")
+                    || osName.startsWith("NeXTStep") || osName.startsWith("Solaris") || osName.startsWith("SunOS")
+                    || osName.startsWith("FreeBSD") || osName.startsWith("NetBSD")) {
+                command = "ifconfig -a";
+            } else if (osName.startsWith("OpenBSD")) {
+                command = "netstat -in";
+            } else if (osName.startsWith("IRIX") || osName.startsWith("AIX") || osName.startsWith("Tru64")) {
+                command = "netstat -ia";
+            } else if (osName.startsWith("Caldera") || osName.startsWith("UnixWare") || osName.startsWith("OpenUNIX")) {
+                command = "ndstat";
+            } else {// Note: Unsupported system.
+                throw new Exception("The current operating system '" + osName + "' is not supported.");
+            }
+
+            Process pid = Runtime.getRuntime().exec(command);
+            BufferedReader in = new BufferedReader(new InputStreamReader(pid.getInputStream()));
+            Pattern p = Pattern.compile("([\\w]{1,2}(-|:)){5}[\\w]{1,2}");
+            while (true) {
+                String line = in.readLine();
+//                System.out.println("line " + line);
+                if (line == null)
+                    break;
+
+                Matcher m = p.matcher(line);
+                if (m.find()) {
+                    macAddress = m.group();
+                    break;
+                }
+            }
+            in.close();
+            return macAddress;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

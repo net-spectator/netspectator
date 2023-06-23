@@ -7,16 +7,18 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class Connection {
-    private Device device;
+public class Connection{
+    private TrackedEquipment device;
     private boolean isAuth = false;
     @NonNull
     private ChannelHandlerContext channelHandlerContext;
 
     @Override
     public String toString() {
-        return (device.getTitle() != null ? device.getTitle() : "NULL") + ": " + channelHandlerContext;
+        return (device != null ? device.getEquipmentTitle() : "NULL") + ": " + channelHandlerContext;
     }
 
-
+    public void closeConnection() {
+        channelHandlerContext.disconnect();
+    }
 }
