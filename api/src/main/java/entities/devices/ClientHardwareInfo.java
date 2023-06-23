@@ -19,7 +19,7 @@ public class ClientHardwareInfo {
     @JsonProperty("cpus")
     private List<Cpu> cpus;
     @JsonProperty("ram")
-    private List<Ram> ram;
+    private Ram ram;
     @JsonProperty("drives")
     private List<Drive> drives;
 }

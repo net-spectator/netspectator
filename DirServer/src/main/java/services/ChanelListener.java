@@ -90,7 +90,7 @@ public class ChanelListener {
                 StringBuilder sensors = new StringBuilder();
                 client.getDevice()
                         .getTrackedEquipmentSensorsList()
-                        .forEach(trackedEquipmentSensors -> sensors.append(" ")
+                        .forEach(trackedEquipmentSensors -> sensors.append(" ") // TODO: 23.06.2023 при первом подключении клиента выскакивает nullPointer и соединение обрывается
                                 .append(trackedEquipmentSensors
                                         .getSensors()
                                         .getSensorTitle()));
