@@ -2,28 +2,26 @@ package services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.devices.ClientHardwareInfo;
-import entities.devices.Hardware;
 import entities.devices.ram.Ram;
 import entities.devices.cpus.Cpu;
 import entities.devices.drives.Drive;
+import oshi.SystemInfo;
 import readers.SensorInfoCollector;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DeviceListener implements Runnable {
-
     private final HashMap<String, SensorInfoCollector> sensors;
-
+    private ClientHardwareInfo chi;
     private final DataOutputStream out;
-
     public DeviceListener(DataOutputStream out, String[] sensorsListFromServer) {
         sensors = new HashMap<>();
+//        chi = new ClientHardwareInfo();
         this.out = out;
         Arrays.stream(sensorsListFromServer).forEach(this::createSensors);
     }
@@ -34,8 +32,9 @@ public class DeviceListener implements Runnable {
 
     @Override
     public void run() {
+        chi = new ClientHardwareInfo();
         updateSensorsStatement();
-        ClientHardwareInfo chi = clientHardwareInfoInit();
+        clientHardwareInfoInit();
         sendClientHardwareInfoToServer(chi);
     }
 
@@ -78,8 +77,8 @@ public class DeviceListener implements Runnable {
         }
     }
 
-    private ClientHardwareInfo clientHardwareInfoInit() {
-        ClientHardwareInfo chi = new ClientHardwareInfo();
+    private void clientHardwareInfoInit() {
+        clientStaticInfoInit();
         sensors.forEach((key, value) -> {
             switch (key) {
                 case "DriveInfoCollector":
@@ -89,10 +88,16 @@ public class DeviceListener implements Runnable {
                     chi.setCpus(castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
                     break;
                 case "RamInfoCollector":
-                    chi.setRam(castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()));
+                    chi.setRam(castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()).get(0));
                     break;
             }
         });
-        return chi;
+    }
+
+    private void clientStaticInfoInit(){
+        SystemInfo systemInfo = new SystemInfo();
+        chi.setOsFamily(systemInfo.getOperatingSystem().toString());
+        chi.setOsManufacture(systemInfo.getOperatingSystem().getManufacturer());
+        chi.setOsVersion(systemInfo.getOperatingSystem().getVersionInfo().getVersion());
     }
 }

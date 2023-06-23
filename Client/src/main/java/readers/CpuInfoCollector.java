@@ -13,6 +13,6 @@ public class CpuInfoCollector implements SensorInfoCollector {
 
     @Override
     public void updateSensorInfo() {
-
+        // TODO: 24.06.2023 доработать сборщик информации о CPU
     }
 }

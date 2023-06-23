@@ -1,24 +1,22 @@
 package services;
 
 import entities.TrackedEquipment;
+import enums.Status;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 
-import javax.persistence.EntityGraph;
 import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 @Transactional
 public class DataBaseService {
     private static final Logger LOGGER = Logger.getLogger(DataBaseService.class);
 
-    SessionFactory factory = new Configuration() //удалить
+    SessionFactory factory = new Configuration() // TODO: 23.06.2023 обеспечить доступ к этому классу из других классов
             .configure("hibernate.cfg.xml")
-//            .addAnnotatedClass(Device.class)
             .buildSessionFactory();
     Session session = null;
 
@@ -86,9 +84,8 @@ public class DataBaseService {
 
     //изменяет статус устройства (мне кажется этот метод не понадобиться
     //так как после подключения hibernate наблюдает за объектами
-    public static int changeTrackedEquipmentStatus(TrackedEquipment device) {
+    public static void changeTrackedEquipmentStatus(long device_id, Status status) {
 
-        return -1;
     }
 
 }

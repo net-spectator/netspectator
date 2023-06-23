@@ -1,4 +1,4 @@
-package converter;
+package utils.converter;
 
 public class ByteToString {
     public static String byteToString(float digit) {
