@@ -1,0 +1,12 @@
+server:
+  port: 8190
+  servlet:
+    context-path: /netsp_requests
+integrations:
+  product-service:
+    url: http://localhost:8189/netsp_client/
+    connect-timeout: 500
+    read-timeout: 10000
+    write-timeout: 5000
+cart-service:
+  cart-prefix: netsp_

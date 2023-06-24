@@ -1,28 +1,20 @@
 package services;
 
 import entities.Requests;
-import entities.RequestsDto;
+import entities.devices.requests.RequestsDto;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.Service;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 import repositories.RequestsRepository;
-
+import repositories.RequestsStatusRepository;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RequestsService {
     private final RequestsRepository requestsRepository;
-
-
-//    public List<Product> findAll (Specification<Product> spec, int page) {
-//        return productRepository.findAll();
-    public Page<Requests> findAll (Specification<Requests> spec, int page) {
-        int sizePage = 10;
-        return requestsRepository.findAll(spec, PageRequest.of(page, sizePage));
-//        return productRepository.findAll(spec, PageRequest.of(page, sizePage));
-    }
+    private final RequestsStatusRepository requestsStatusRepository;
 
     public Optional<Requests> findById(Long id) {
         return requestsRepository.findById(id);
@@ -32,12 +24,21 @@ public class RequestsService {
         requestsRepository.deleteById(id);
     }
 
-    public Requests createNewRequests (RequestsDto productDto){
-
-//        product.setPrice(productDto.getPrice());
-//        product.setTitle(productDto.getTitle());
-//        product.setCategory(category);
-        requestsRepository.save(req);
+    public Requests createNewRequests (RequestsDto requestsDto){
+        Requests requests = Requests.newBuilder()
+                .topic(requestsDto.getTopic())
+                .description(requestsDto.getDescription())
+                .executor_comments(requestsDto.getExecutor_comments())
+                .request_status(requestsDto.getRequest_status())
+                .request_user_id(requestsDto.getRequest_user_id())
+                .request_user_id(requestsDto.getRequest_user_id())
+                .equipment_id(requestsDto.getEquipment_id())
+                .build();
+        requestsRepository.save(requests);
         return requests;
+    }
+
+    public Page<Requests> findAll() {
+        return (Page<Requests>) requestsStatusRepository.findAll();
     }
 }

@@ -1,7 +1,7 @@
-
+import org.springframework.boot.SpringApplication;
 
 public class Requests {
     public static void main(String[] args) {
-        new Requests();
+        SpringApplication.run(Requests.class, args);
     }
 }
