@@ -13,7 +13,7 @@
         <property name="hibernate.format_sql">true</property>
         <property name="current_session_context_class">thread</property>
         <mapping class="entities.TrackedEquipment"/>
-        <mapping class="entities.Routers"/>
+        <mapping class="entities.EquipmentType"/>
         <mapping class="entities.Sensors"/>
         <mapping class="entities.TrackedEquipmentSensors"/>
     </session-factory>

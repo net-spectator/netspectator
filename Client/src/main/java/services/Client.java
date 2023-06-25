@@ -33,7 +33,7 @@ public class Client {
     private boolean isInteractive;
     private ScheduledExecutorService executor;
     private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
-    private static long PERIOD =5; // TODO: 22.06.2023 перенести в clientParams
+    private static long PERIOD = 5; // TODO: 22.06.2023 перенести в clientParams
     private static final Logger LOGGER = Logger.getLogger(Client.class);
 
     public static String getClientParams(String param) {
@@ -147,9 +147,7 @@ public class Client {
                         out.write(("\\clientName " + clientParams.get("Client name")).getBytes());
                         break;
                     case "startSensors":
-                        if (query.length >= 2) {
-                            executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
-                        }
+                        executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
                         break;
                     case "getMac":
                         out.write(("\\macAddress " + getMacAddress()).getBytes());

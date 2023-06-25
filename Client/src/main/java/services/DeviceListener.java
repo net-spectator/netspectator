@@ -17,13 +17,25 @@ import java.util.stream.Collectors;
 
 public class DeviceListener implements Runnable {
     private final HashMap<String, SensorInfoCollector> sensors;
+    private static final List<String> unsupportedOsList = Arrays.asList("Mac", "Android");
     private ClientHardwareInfo chi;
     private final DataOutputStream out;
+    private static boolean supportedOs = false;
+
+    public static boolean isSupportedOs() {
+        return supportedOs;
+    }
     public DeviceListener(DataOutputStream out, String[] sensorsListFromServer) {
+        supportedOs = checkOs();
         sensors = new HashMap<>();
-//        chi = new ClientHardwareInfo();
+        chi = new ClientHardwareInfo();
         this.out = out;
         Arrays.stream(sensorsListFromServer).forEach(this::createSensors);
+    }
+
+    private boolean checkOs() {
+        String currentOs = System.getProperty("os.name");
+        return unsupportedOsList.stream().noneMatch(currentOs::startsWith);
     }
 
     private void updateSensorsStatement() {
