@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import users.data.Role;
-import users.data.User;
-import users.data.UserDetails;
+import users.entities.Role;
+import users.entities.User;
+import users.entities.UserDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;

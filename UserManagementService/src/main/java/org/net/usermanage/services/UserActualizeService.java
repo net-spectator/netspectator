@@ -7,9 +7,9 @@ import org.net.usermanage.converters.UserDetailsConverter;
 import org.net.usermanage.repositories.UserRepository;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Service;
-import users.data.Role;
-import users.data.User;
-import users.data.UserDetails;
+import users.entities.Role;
+import users.entities.User;
+import users.entities.UserDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;

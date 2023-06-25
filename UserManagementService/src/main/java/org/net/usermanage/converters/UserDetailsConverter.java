@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Component;
-import users.data.UserDetails;
+import users.entities.UserDetails;
 
 import java.util.*;
 

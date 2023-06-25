@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.server.resource.introspection.Reactiv
 
 @SpringBootApplication
 @EnableWebFluxSecurity
-@EntityScan(basePackages = {"users.data"})
+@EntityScan(basePackages = {"users.entities"})
 public class UserManageApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserManageApplication.class);
