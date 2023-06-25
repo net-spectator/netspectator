@@ -47,9 +47,15 @@ public class TrackedEquipment {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "type")
+    private EquipmentType typeId;
+
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "trackedEquipment", cascade = CascadeType.ALL)
     private List<TrackedEquipmentSensors> trackedEquipmentSensorsList;
+
     @Transient
     private ClientHardwareInfo deviceInfo;
 }

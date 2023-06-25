@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class RamInfoCollector implements SensorInfoCollector {
-    private final List<? super Hardware> ramList;
+    private final List<? super Hardware> ramList; // TODO: 24.06.2023 добавить логирование событий 
     private final SystemInfo systemInfo;
     private final Ram ram;
 

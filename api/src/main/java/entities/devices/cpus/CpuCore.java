@@ -8,5 +8,5 @@ public class CpuCore {
     @JsonProperty("coreName")
     private String coreName;
     @JsonProperty("temperature")
-    private long temperature;
+    private double temperature;
 }
