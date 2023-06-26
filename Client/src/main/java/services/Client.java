@@ -204,7 +204,6 @@ public class Client {
             String command = "ifconfig";
 
             String osName = System.getProperty("os.name");
-//            System.out.println("Operating System is " + osName);
 
             if (osName.startsWith("Windows")) {
                 command = "ipconfig /all";
@@ -227,7 +226,6 @@ public class Client {
             Pattern p = Pattern.compile("([\\w]{1,2}(-|:)){5}[\\w]{1,2}");
             while (true) {
                 String line = in.readLine();
-//                System.out.println("line " + line);
                 if (line == null)
                     break;
 

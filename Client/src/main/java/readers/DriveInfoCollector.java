@@ -3,6 +3,7 @@ package readers;
 import com.profesorfalken.jsensors.JSensors;
 import com.profesorfalken.jsensors.model.components.Components;
 import com.profesorfalken.jsensors.model.components.Disk;
+import com.profesorfalken.jsensors.model.sensors.Temperature;
 import entities.devices.Hardware;
 import entities.devices.drives.Drive;
 import entities.devices.drives.Partition;
@@ -33,8 +34,8 @@ public class DriveInfoCollector implements SensorInfoCollector {
     }
 
     /**
-     * В определяем состояние жестких дисков и в зависимости от операционной системы добавляем их температуру.
-     * В случае если операционная система находится в списке неподдерживаемых - мы получаем только имя диска и оставшееся место.
+     * - Определяет состояние HDD/SSD (считывает доступное место, общий объем).
+     * Если операционная система в списке поддерживаемых, добавляет температуру HDD/SSD.
      * */
     @Override
     public List<? super Hardware> collectInfo() {
@@ -69,11 +70,16 @@ public class DriveInfoCollector implements SensorInfoCollector {
                         disks.stream().filter(disk1 -> {
                             try {
                                 int occupiedSpaceInPercentFromJSensor = (disk1.sensors.loads.get(0).value.intValue());
-                                return occupiedSpaceInPercentFromJSensor == occupiedSpaceInPercent;
+                                return occupiedSpaceInPercentFromJSensor == occupiedSpaceInPercent && drive.getDeviceName().toLowerCase().contains(disk1.name.toLowerCase());
                             } catch (IndexOutOfBoundsException e) {
                                 return false;
                             }
-                        }).findFirst().ifPresent(disk -> drive.setTemperature(disk.sensors.temperatures.get(0).value));
+                        }).findFirst().ifPresent(disk -> {
+                            List<Temperature> temperature = disk.sensors.temperatures;
+                            if (temperature.size() > 0) {
+                                drive.setTemperature(disk.sensors.temperatures.get(0).value);
+                            }
+                        });
                     }
                     hardware.add(drive);
                     sb.delete(0, sb.length());
