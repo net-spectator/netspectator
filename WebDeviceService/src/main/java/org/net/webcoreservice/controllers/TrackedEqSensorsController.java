@@ -8,6 +8,7 @@ import org.net.webcoreservice.service.TrackedEqSensorsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import services.ClientListenersDataBus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,6 +52,11 @@ public class TrackedEqSensorsController {
             return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Связь уже существует"), HttpStatus.BAD_REQUEST);
         }
         trackedEqSensorsService.addSensorInEquipment(dto);
+        disconnect(dto.getEquipmentId());
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    private void disconnect(Long equipmentId) {
+        ClientListenersDataBus.disconnectClient(equipmentId);
     }
 }

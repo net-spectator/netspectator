@@ -31,6 +31,11 @@ public class TrackedEquipmentController {
         return trackedEquipmentService.getEquipmentHardwareInfo(id);
     }
 
+    @PostMapping("/disconnect/{id}")
+    public void disconnectClient(@PathVariable Long id) {
+        trackedEquipmentService.disconnect(id);
+    }
+
     @GetMapping("/blackList")
     public List<TrackedEquipmentDto> getAllBlackList() {
         return trackedEquipmentService.showBlackList().stream().map(converter::entityToDto).collect(Collectors.toList());
