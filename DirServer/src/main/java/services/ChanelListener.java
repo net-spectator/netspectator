@@ -47,7 +47,7 @@ public class ChanelListener {
                 messageSender.sendMessageWithHeader("Welcome to Net Spectator server. ");
                 break;
             case "/auth":
-                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("admin"))) {
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.getProperties(("admin")))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
                     TrackedEquipment device = new TrackedEquipment(); //убрать этот момент, имя должно браться настоящее
@@ -58,7 +58,7 @@ public class ChanelListener {
                 }
                 break;
             case "\\auth":
-                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("publicKey"))) {
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.getProperties("publicKey"))) {
                     client.setAuth(true);
                     messageSender.sendMessageWithoutHeader("getId");
                 } else {

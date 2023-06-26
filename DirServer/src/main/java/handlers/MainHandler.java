@@ -23,7 +23,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("New connection " + ctx.channel().localAddress());
+        LOGGER.info("New connection " + ctx.channel().localAddress());
         if (ClientListenersDataBus.getDisabledClient(ctx.channel().localAddress()) != null) {
             ctx.disconnect();
         }

@@ -35,11 +35,16 @@ public class DataBaseService {
     //добавляет новое устройство в базу данных
     public int addTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
-        session.beginTransaction();
-        session.save(device);
+        try {
+            session.beginTransaction();
+            session.save(device);
+        } catch (Exception e) {
+            return -1;
+        }
         session.getTransaction().commit();
-        return -1;
+        return 1;
     }
+
     @Transactional
     public TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
         session = factory.getCurrentSession();
@@ -69,7 +74,7 @@ public class DataBaseService {
         session.getTransaction().commit();
     }
 
-    public void updateTrackedEquipment(TrackedEquipment device){
+    public void updateTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         session.update(device);
