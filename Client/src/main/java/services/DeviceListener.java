@@ -7,6 +7,7 @@ import entities.devices.cpus.Cpu;
 import entities.devices.drives.Drive;
 import oshi.SystemInfo;
 import readers.SensorInfoCollector;
+import utils.NSLogger;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,10 +22,12 @@ public class DeviceListener implements Runnable {
     private ClientHardwareInfo chi;
     private final DataOutputStream out;
     private static boolean supportedOs = false;
+    private static final NSLogger LOGGER = new NSLogger(DeviceListener.class);
 
     public static boolean isSupportedOs() {
         return supportedOs;
     }
+
     public DeviceListener(DataOutputStream out, String[] sensorsListFromServer) {
         supportedOs = checkOs();
         sensors = new HashMap<>();
@@ -35,6 +38,7 @@ public class DeviceListener implements Runnable {
 
     private boolean checkOs() {
         String currentOs = System.getProperty("os.name");
+        LOGGER.info(String.format("Используемая OS: %s", currentOs));
         return unsupportedOsList.stream().noneMatch(currentOs::startsWith);
     }
 
@@ -106,7 +110,7 @@ public class DeviceListener implements Runnable {
         });
     }
 
-    private void clientStaticInfoInit(){
+    private void clientStaticInfoInit() {
         SystemInfo systemInfo = new SystemInfo();
         chi.setOsFamily(systemInfo.getOperatingSystem().toString());
         chi.setOsManufacture(systemInfo.getOperatingSystem().getManufacturer());

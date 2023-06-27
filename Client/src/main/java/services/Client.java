@@ -1,9 +1,9 @@
 package services;
 
 
-import config.IniFileOperator;
 import config.Logo;
 import org.apache.log4j.Logger;
+import utils.NSLogger;
 import utils.converter.PropertiesOperator;
 
 import java.io.*;
@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +37,7 @@ public class Client {
 
     private static String PROPERTIES_PATH = "client.properties";
     public static Properties properties;
-    private static final Logger LOGGER = Logger.getLogger(Client.class);
+    private static final NSLogger LOGGER = new NSLogger(Client.class);
 
     public Client() {
         executor = Executors.newSingleThreadScheduledExecutor();
