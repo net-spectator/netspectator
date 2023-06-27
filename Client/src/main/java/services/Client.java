@@ -1,9 +1,10 @@
 package services;
 
 
-import config.IniFileOperator;
 import config.Logo;
 import org.apache.log4j.Logger;
+import utils.NSLogger;
+import utils.converter.PropertiesOperator;
 
 import java.io.*;
 import java.net.*;
@@ -11,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,7 +27,6 @@ public class Client {
     private ReadableByteChannel rbc;
     private ExecutorService threadManager;
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(8 * 1024);
-    private static HashMap<String, String> clientParams;
     private Socket socket;
     private String ADDRESS;
     private int PORT;
@@ -34,15 +34,16 @@ public class Client {
     private ScheduledExecutorService executor;
     private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
     private static long PERIOD = 5; // TODO: 22.06.2023 перенести в clientParams
-    private static final Logger LOGGER = Logger.getLogger(Client.class);
 
-    public static String getClientParams(String param) {
-        return clientParams.get(param);
-    }
+    private static String PROPERTIES_PATH = "client.properties";
+    public static Properties properties;
+    private static final NSLogger LOGGER = new NSLogger(Client.class);
 
     public Client() {
         executor = Executors.newSingleThreadScheduledExecutor();
         paramsInit();
+
+
         while (true) {
             LOGGER.info(String.format("Попытка установить соединение с сервером [%s:%s]", ADDRESS, PORT));
             tryToConnect();
@@ -55,20 +56,22 @@ public class Client {
     }
 
     private void paramsInit() {
-        clientParams = IniFileOperator.initFileParams("client.ini");
-        System.out.println(Logo.showLogo());
-        assert clientParams != null;
-        ADDRESS = clientParams.get("Address");
-        LOGGER.info(String.format("Адрес сервера: [%s]", ADDRESS));
-        PORT = Integer.parseInt(clientParams.get("Port"));
-        LOGGER.info(String.format("Порт сервера: [%s]", PORT));
-        isInteractive = clientParams.get("Interactive mode").equals("true");
-        if (!isInteractive) {
-            LOGGER.info("Активирован автоматический режим");
-        } else {
-            LOGGER.info("Активирован интерактивный режим");
+        properties = PropertiesOperator.returnProperties(PROPERTIES_PATH);
+        if (properties != null) {
+            PORT = Integer.parseInt(properties.get("port").toString());
+            LOGGER.info(String.format("Порт сервера: [%s]", PORT));
+            LOGGER.info(String.format("Сервер прослушивает порт: [%s]", PORT));
+            ADDRESS = properties.getProperty("address");
+            LOGGER.info(String.format("Адрес сервера: [%s]", ADDRESS));
+            isInteractive = properties.getProperty("interactive_mode").equals("true");
+            System.out.println(Logo.showLogo());
+            if (!isInteractive) {
+                LOGGER.info("Активирован автоматический режим");
+            } else {
+                LOGGER.info("Активирован интерактивный режим");
+            }
+            properties.put("name", deviceName());
         }
-        clientParams.put("Client name", deviceName());
     }
 
     private int connect() {
@@ -131,20 +134,20 @@ public class Client {
         String[] query;
         boolean keepAlive = true;
         try {
-            out.write(("\\auth " + clientParams.get("Public key")).getBytes());
+            out.write(("\\auth " + properties.getProperty("pub_key")).getBytes());
             while (keepAlive) {
                 query = queryStringListener().replace("\n", "").split(" ");
                 switch (query[0]) {
                     case "getId":
-                        out.write(("\\clientID " + clientParams.get("Client ID")).getBytes());
+                        out.write(("\\clientID " + properties.getProperty("client_id")).getBytes());
                         break;
                     case "newID":
-                        clientParams.put("Client ID", query[1]);
-                        IniFileOperator.writeFileParams(clientParams);
+                        properties.setProperty("client_id", query[1]);
+                        PropertiesOperator.propertiesWriter(properties, PROPERTIES_PATH);
                         LOGGER.info(String.format("Клиенту присвоен новый ID: [%s]", query[1]));
                         break;
                     case "getName":
-                        out.write(("\\clientName " + clientParams.get("Client name")).getBytes());
+                        out.write(("\\clientName " + properties.getProperty("name")).getBytes());
                         break;
                     case "startSensors":
                         executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
