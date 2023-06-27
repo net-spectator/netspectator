@@ -77,10 +77,12 @@ public class DeviceListener implements Runnable {
     }
 
     private void createSensors(String sensorName) {
+        LOGGER.info("Подключаю доступные сенсоры");
         sensors.put(castClass("readers." + sensorName)
                         .getClass()
                         .getSimpleName(),
                 castClass("readers." + sensorName));
+        LOGGER.info("Сенсоры подключены");
     }
 
     private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) {
@@ -97,14 +99,18 @@ public class DeviceListener implements Runnable {
     private void clientHardwareInfoInit() {
         clientStaticInfoInit();
         sensors.forEach((key, value) -> {
+            LOGGER.info("Формирую ClientHardwareInfo");
             switch (key) {
                 case "DriveInfoCollector":
+                    LOGGER.info("Собираю информацию о накопителях");
                     chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
                     break;
                 case "CpuInfoCollector":
+                    LOGGER.info("Собираю информацию о CPU");
                     chi.setCpus(castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
                     break;
                 case "RamInfoCollector":
+                    LOGGER.info("Собираю информацию о RAM");
                     chi.setRam(castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()).get(0));
                     break;
             }

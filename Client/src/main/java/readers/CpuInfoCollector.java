@@ -30,7 +30,7 @@ public class CpuInfoCollector implements SensorInfoCollector {
     @Override
     public void updateSensorInfo() {
         cpuList.clear();
-        LOGGER.info(String.format("Используемая OS - %s для логирования CPU", DeviceListener.isSupportedOs() ? "поддерживается" : "не поддерживается"));
+        LOGGER.info(String.format("Используемая OS - %s для детального логирования CPU", DeviceListener.isSupportedOs() ? "поддерживается" : "не поддерживается"));
         if (DeviceListener.isSupportedOs()) {
             LOGGER.info("Инициализация компоненты JSensors");
             Components component = JSensors.get.components();
@@ -59,6 +59,6 @@ public class CpuInfoCollector implements SensorInfoCollector {
             }
         }
         LOGGER.info(String.format("Дальнейшая запись логов в классе %s не требуется, логер отключен", this.getClass().getSimpleName()));
-        LOGGER = null;
+        LOGGER.setDisabled(true);
     }
 }

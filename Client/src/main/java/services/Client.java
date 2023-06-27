@@ -30,6 +30,7 @@ public class Client {
     private Socket socket;
     private String ADDRESS;
     private int PORT;
+    private String MACAddress;
     private boolean isInteractive;
     private ScheduledExecutorService executor;
     private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
@@ -139,6 +140,7 @@ public class Client {
                 query = queryStringListener().replace("\n", "").split(" ");
                 switch (query[0]) {
                     case "getId":
+                        LOGGER.info("Сервер запрашивает ID");
                         out.write(("\\clientID " + properties.getProperty("client_id")).getBytes());
                         break;
                     case "newID":
@@ -147,21 +149,26 @@ public class Client {
                         LOGGER.info(String.format("Клиенту присвоен новый ID: [%s]", query[1]));
                         break;
                     case "getName":
+                        LOGGER.info("Сервер запрашивает имя");
                         out.write(("\\clientName " + properties.getProperty("name")).getBytes());
                         break;
                     case "startSensors":
                         executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
                         break;
                     case "getMac":
-                        out.write(("\\macAddress " + getMacAddress()).getBytes());
+                        LOGGER.info("Сервер запрашивает MAC адрес");
+                        MACAddress = getMacAddress();
+                        LOGGER.info(String.format("MAC адресс текущего устройства - %s", MACAddress));
+                        out.write(("\\macAddress " + MACAddress).getBytes());
                         break;
                     case "close":
+                        LOGGER.info("Запрос о перезагрузке клиента");
                         keepAlive = false;
                         break;
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Connection closed.");
+            LOGGER.error("Connection closed");
             executor.shutdown();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -196,7 +203,7 @@ public class Client {
         try {
             computerName = Inet4Address.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            LOGGER.error("Не удалось определить имя устройства", e);
         }
         return computerName;
     }
@@ -241,7 +248,7 @@ public class Client {
             in.close();
             return macAddress;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Не удалось определить MAC адрес устройства", e);
         }
         return null;
     }
