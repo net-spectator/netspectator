@@ -7,9 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DisabledClientsControl {
     private final MessageSender messageSender;
-
     private final Connection client;
-
     public DisabledClientsControl(MessageSender messageSender, Connection client) {
         this.messageSender = messageSender;
         this.client = client;

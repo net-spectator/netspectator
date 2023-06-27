@@ -35,10 +35,13 @@ public class ChanelListener {
                 .replace("\n", "")
                 .replace("\r", "")
                 .split(" ", 0);
-        LOGGER.info(String.format("Received header with content: [%s]", byteBuf.toString(StandardCharsets.UTF_8)));
 
         if (header[0].toLowerCase().contains("ssh")) {
             ctx.disconnect();
+        }
+
+        if (!header[0].equals("\\ClientHardwareInfo")) {
+            LOGGER.info(String.format("Received header with content: [%s]", request));
         }
 
         /*  \\ - автоматический режим работы агента, / - интерактивный режим работы агента */
@@ -104,7 +107,7 @@ public class ChanelListener {
                     LOGGER.info("Bad command");
                 }
                 break;
-            case "/disabledList":
+            case "/blacklist":
                 if (!blackList.disabledClientsListOperator(header)) {
                     LOGGER.info("Bad command");
                 }

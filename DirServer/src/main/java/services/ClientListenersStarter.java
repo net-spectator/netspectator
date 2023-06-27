@@ -20,7 +20,7 @@ public final class ClientListenersStarter {
     private static EventLoopGroup auth;
     private static EventLoopGroup worker;
     private static int PORT;
-    private static String PROPERTIES_PATH = "WebDeviceService/src/main/resources/server.properties";
+    private static String PROPERTIES_PATH = "server.properties";
     public static Properties properties;
     private static final Logger LOGGER = Logger.getLogger(ClientListenersStarter.class);
 
