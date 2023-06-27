@@ -33,6 +33,7 @@ public class DeviceListener implements Runnable {
         sensors = new HashMap<>();
         chi = new ClientHardwareInfo();
         this.out = out;
+        LOGGER.info(String.format("Инициализация сенсоров: %s", Arrays.toString(sensorsListFromServer)));
         Arrays.stream(sensorsListFromServer).forEach(this::createSensors);
     }
 

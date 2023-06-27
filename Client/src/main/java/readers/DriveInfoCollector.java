@@ -11,6 +11,7 @@ import oshi.SystemInfo;
 import oshi.hardware.HWDiskStore;
 import oshi.hardware.HWPartition;
 import services.DeviceListener;
+import utils.NSLogger;
 
 import java.io.IOException;
 import java.nio.file.FileStore;
@@ -26,6 +27,7 @@ public class DriveInfoCollector implements SensorInfoCollector {
     private List<HWDiskStore> drives;
     private List<Disk> disks;
     private final List<? super Hardware> hardware;
+    private static final NSLogger LOGGER = new NSLogger(DriveInfoCollector.class);
 
     public DriveInfoCollector() {
         hardware = new ArrayList<>();
@@ -33,13 +35,28 @@ public class DriveInfoCollector implements SensorInfoCollector {
         updateSensorInfo();
     }
 
+    @Override
+    public List<? super Hardware> collectInfo() {
+        return Collections.unmodifiableList(hardware);
+    }
+
     /**
      * - Определяет состояние HDD/SSD (считывает доступное место, общий объем).
      * Если операционная система в списке поддерживаемых, добавляет температуру HDD/SSD.
      * */
     @Override
-    public List<? super Hardware> collectInfo() {
-        hardware.clear();
+    public void updateSensorInfo() {
+        hardware.clear(); //очищаем лист от предыдущих записей
+        drives = systemInfo.getHardware().getDiskStores();
+        LOGGER.info(String.format("Используемая OS - %s для логирования HDD/SSD", DeviceListener.isSupportedOs() ? "поддерживается" : "не поддерживается"));
+
+        if (DeviceListener.isSupportedOs()) { //инициализируем компоненты
+            LOGGER.info("Инициализация компоненты JSensors");
+            component = JSensors.get.components();
+            LOGGER.info("Инициализация компоненты JSensors успешна");
+            disks = component.disks;
+        }
+
         StringBuilder sb = new StringBuilder();
         try {
             for (HWDiskStore ds : drives) {
@@ -87,16 +104,6 @@ public class DriveInfoCollector implements SensorInfoCollector {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        return Collections.unmodifiableList(hardware);
-    }
-
-    @Override
-    public void updateSensorInfo() {
-        drives = systemInfo.getHardware().getDiskStores();
-        if (DeviceListener.isSupportedOs()) {
-            component = JSensors.get.components();
-            disks = component.disks;
         }
     }
 }
