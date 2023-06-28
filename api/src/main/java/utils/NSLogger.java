@@ -7,6 +7,8 @@ public class NSLogger {
     private boolean disabled; //позволяет отключать логирование событий (можно будет потом убрать если не нужно)
     private final Class<?> clazz;
 
+    private final String moduleName;
+
     public boolean isDisabled() {
         return disabled;
     }
@@ -16,6 +18,7 @@ public class NSLogger {
     }
 
     public NSLogger(Class<?> clazz) {
+        moduleName = clazz.getModule().getName();
         this.clazz = clazz;
         init();
     }

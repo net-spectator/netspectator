@@ -16,7 +16,7 @@ import java.util.List;
 public class CpuInfoCollector implements SensorInfoCollector {
     private final List<? super Hardware> cpuList;
 
-    public CpuInfoCollector() { // TODO: 25.06.2023 перенести в проект
+    public CpuInfoCollector() {
         cpuList = new ArrayList<>();
     }
 
@@ -33,23 +33,27 @@ public class CpuInfoCollector implements SensorInfoCollector {
         LOGGER.info(String.format("Используемая OS - %s для детального логирования CPU", DeviceListener.isSupportedOs() ? "поддерживается" : "не поддерживается"));
         if (DeviceListener.isSupportedOs()) {
             LOGGER.info("Инициализация компоненты JSensors");
-            Components component = JSensors.get.components();
+            List<Cpu> cpus = JSensors.get.components().cpus;
             LOGGER.info("Инициализация компоненты JSensors успешна");
-            List<Cpu> cpus = component.cpus;
-            LOGGER.info(String.format("Обнаружен процессор, количество ядер - %s", cpus.size()));
+            LOGGER.info(String.format("Обнаружено процессоров - %s", cpus.size()));
             entities.devices.cpus.Cpu deviceCpu = new entities.devices.cpus.Cpu();
             for (final Cpu c : cpus) {
+                LOGGER.info(String.format("Количество ядер - %s", c.sensors.temperatures.size()-1));
                 deviceCpu.setDeviceName(c.name);
                 LOGGER.info(String.format("Наименование процессора - %s", deviceCpu.getDeviceName()));
                 if (c.sensors.temperatures.size() > 0) {
                     LOGGER.info("Чтение информации о ядрах CPU");
                     deviceCpu.setCores(new ArrayList<>());
                     for (Temperature cores : c.sensors.temperatures) {
-                        CpuCore core = new CpuCore();
-                        core.setCoreName(cores.name);
-                        core.setTemperature(cores.value);
-                        LOGGER.info(String.format("Наименование ядра - %s, температура ядра - %s", core.getCoreName(), core.getTemperature()));
-                        deviceCpu.getCores().add(core);
+                        if (!cores.name.contains("Package")) {
+                            CpuCore core = new CpuCore();
+                            core.setCoreName(cores.name);
+                            core.setCoreTemperature(cores.value);
+                            LOGGER.info(String.format("Наименование ядра - %s, температура ядра - %s", core.getCoreName(), core.getCoreTemperature()));
+                            deviceCpu.getCores().add(core);
+                        } else {
+                            deviceCpu.setCpuTemperature(cores.value);
+                        }
                     }
                     LOGGER.info("Чтение завершено");
                 }
