@@ -9,6 +9,7 @@ import org.net.webcoreservice.service.TrackedEquipmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utils.NSLogger;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ public class TrackedEquipmentController {
     private final TrackedEquipmentService trackedEquipmentService;
     private final TrackedEquipmentConverter converter;
 
+    private final NSLogger LOGGER = new NSLogger(TrackedEquipmentController.class); //добавил логгер
+
     @GetMapping
     public List<TrackedEquipmentDto> getAllEquipment() {
         return trackedEquipmentService.findAll().stream().map(converter::entityToDto).collect(Collectors.toList());
@@ -28,6 +31,7 @@ public class TrackedEquipmentController {
 
     @GetMapping("/hardwareInfo/{id}")
     public ClientHardwareInfo getHardwareInfo(@PathVariable Long id) {
+        LOGGER.info("Сработал логгер");
         return trackedEquipmentService.getEquipmentHardwareInfo(id);
     }
 
