@@ -1,6 +1,7 @@
 package readers;
 
 import com.profesorfalken.jsensors.JSensors;
+import com.profesorfalken.jsensors.model.components.Components;
 import com.profesorfalken.jsensors.model.components.Disk;
 import com.profesorfalken.jsensors.model.sensors.Temperature;
 import entities.devices.Hardware;
@@ -22,11 +23,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class DriveInfoCollector implements SensorInfoCollector {
+    private Components component = null;
     private final SystemInfo systemInfo;
     private List<HWDiskStore> drives;
     private List<Disk> disks;
     private final List<? super Hardware> hardware;
-    private static final NSLogger LOGGER = new NSLogger(DriveInfoCollector.class);
+    private static NSLogger LOGGER = new NSLogger(DriveInfoCollector.class);
 
     public DriveInfoCollector() {
         hardware = new ArrayList<>();
@@ -51,8 +53,9 @@ public class DriveInfoCollector implements SensorInfoCollector {
 
         if (DeviceListener.isSupportedOs()) { //инициализируем компоненты
             LOGGER.info("Инициализация компоненты JSensors");
-            disks = JSensors.get.components().disks;
+            component = JSensors.get.components();
             LOGGER.info("Инициализация компоненты JSensors успешна");
+            disks = component.disks;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -88,25 +91,26 @@ public class DriveInfoCollector implements SensorInfoCollector {
                             drive.getPartitions().add(partition);
                         }
                     }
-                    if (DeviceListener.isSupportedOs() && diskTotalUsableSpace > 0) { //сопоставляем показатели температуры дискам
+                    LOGGER.info(String.format("Всего места на накопителе - %s", ByteToString.byteToString(diskTotalUsableSpace)));
+                    if (component != null && DeviceListener.isSupportedOs()) { //сопоставляем показатели температуры дискам
                         LOGGER.info(String.format("Сопоставляю температуру накопителю - %s", drive.getDeviceName()));
                         int occupiedSpaceInPercent = (int) (((double) diskTotalUsableSpace * 100) / ds.getSize());
                         LOGGER.info(String.format("Занято места на диске (процент) - %s ", occupiedSpaceInPercent));
-                        disks.stream().filter(JSensorsDisk -> {
+                        disks.stream().filter(disk1 -> {
                             try {
-                                int occupiedSpaceInPercentFromJSensor = (JSensorsDisk.sensors.loads.get(0).value.intValue());
-                                LOGGER.info(String.format("По результатам SystemInfo - %s, по результатам JSensor - %s ", occupiedSpaceInPercentFromJSensor, occupiedSpaceInPercent));
-                                return occupiedSpaceInPercentFromJSensor == occupiedSpaceInPercent;
+                                int occupiedSpaceInPercentFromJSensor = (disk1.sensors.loads.get(0).value.intValue());
+                                LOGGER.info(String.format("По результатам JSensor - %s, по результатам SystemInfo - %s ", occupiedSpaceInPercentFromJSensor, occupiedSpaceInPercent));
+                                LOGGER.info(String.format("Наименование по результатам JSensor - %s, по результатам SystemInfo - %s ", drive.getDeviceName().toLowerCase(), disk1.name.toLowerCase()));
+                                return occupiedSpaceInPercentFromJSensor == occupiedSpaceInPercent && drive.getDeviceName().toLowerCase().contains(disk1.name.toLowerCase());
                             } catch (IndexOutOfBoundsException e) {
                                 return false;
                             }
-                        }).findFirst().ifPresent(JSensorsDisk -> {
+                        }).findFirst().ifPresent(disk -> {
                             LOGGER.info("Сопоставляю температуру накопителю");
-                            List<Temperature> temperature = JSensorsDisk.sensors.temperatures;
+                            List<Temperature> temperature = disk.sensors.temperatures;
                             if (temperature.size() > 0) {
-                                drive.setTemperature(JSensorsDisk.sensors.temperatures.get(0).value);
+                                drive.setTemperature(disk.sensors.temperatures.get(0).value);
                                 LOGGER.info(String.format("Температура накопителя - %s C", drive.getTemperature()));
-                                disks.remove(JSensorsDisk);
                             }
                         });
                     }
