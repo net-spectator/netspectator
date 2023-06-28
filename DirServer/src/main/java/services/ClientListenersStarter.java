@@ -7,13 +7,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
+import utils.NSLogger;
 import utils.converter.PropertiesOperator;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Properties;
 
 public final class ClientListenersStarter {
@@ -22,7 +18,7 @@ public final class ClientListenersStarter {
     private static int PORT;
     private static String PROPERTIES_PATH = "server.properties";
     public static Properties properties;
-    private static final Logger LOGGER = Logger.getLogger(ClientListenersStarter.class);
+    private static final NSLogger LOGGER = new NSLogger(ClientListenersStarter.class);
 
     public static String getProperties(String key) {
         return properties.get(key).toString();
