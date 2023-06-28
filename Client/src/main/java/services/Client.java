@@ -33,8 +33,8 @@ public class Client {
     private String MACAddress;
     private boolean isInteractive;
     private ScheduledExecutorService executor;
-    private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
-    private static long PERIOD = 5; // TODO: 22.06.2023 перенести в clientParams
+    private long INIT_DELAY;
+    private long EXECUTION_PERIOD;
 
     private static String PROPERTIES_PATH = "client.properties";
     public static Properties properties;
@@ -65,6 +65,10 @@ public class Client {
             ADDRESS = properties.getProperty("address");
             LOGGER.info(String.format("Адрес сервера: [%s]", ADDRESS));
             isInteractive = properties.getProperty("interactive_mode").equals("true");
+            INIT_DELAY = Long.parseLong(properties.getProperty("schedule_init_delay"));
+            LOGGER.info(String.format("Отложенный запуск задания: [%s] ms", INIT_DELAY));
+            EXECUTION_PERIOD = Long.parseLong(properties.getProperty("schedule_execution_period"));
+            LOGGER.info(String.format("Периодичность запуска: [%s] ms", EXECUTION_PERIOD));
             System.out.println(Logo.showLogo());
             if (!isInteractive) {
                 LOGGER.info("Активирован автоматический режим");
@@ -153,7 +157,7 @@ public class Client {
                         out.write(("\\clientName " + properties.getProperty("name")).getBytes());
                         break;
                     case "startSensors":
-                        executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+                        executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, EXECUTION_PERIOD, TimeUnit.SECONDS);
                         break;
                     case "getMac":
                         LOGGER.info("Сервер запрашивает MAC адрес");

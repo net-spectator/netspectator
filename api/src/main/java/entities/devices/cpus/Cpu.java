@@ -9,6 +9,8 @@ import java.util.List;
 public class Cpu extends Hardware {
     @JsonProperty("deviceName")
     private String deviceName;
+    @JsonProperty("cpuTemperature")
+    private double cpuTemperature;
     @JsonProperty("cores")
     private List<CpuCore> cores;
 }
