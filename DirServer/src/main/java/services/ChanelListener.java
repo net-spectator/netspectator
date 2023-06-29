@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static enums.Status.OFFLINE;
 import static enums.Status.ONLINE;
 
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class ChanelListener {
     private final MessageSender messageSender;
     private final ConnectionsList connections;
     private final DisabledClientsControl blackList;
-    private final Connection client;
+    private final Connection connection;
     private final ServerControl server;
     private final DataBaseService dbService;
     private static final Logger LOGGER = Logger.getLogger(ChanelListener.class);
@@ -46,29 +47,33 @@ public class ChanelListener {
 
         /*  \\ - автоматический режим работы агента, / - интерактивный режим работы агента */
         switch (header[0]) {
+            //---------------------------------------------------------------------------приветствие
             case "/hello":
                 messageSender.sendMessageWithHeader("Welcome to Net Spectator server. ");
                 break;
+            //---------------------------------------------------------------------------авторизация в режиме консоли
             case "/auth":
                 if (header.length > 1 && header[1].equals(ClientListenersStarter.getProperties(("admin")))) {
-                    client.setAuth(true);
+                    connection.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
-                    TrackedEquipment device = new TrackedEquipment(); //убрать этот момент, имя должно браться настоящее
+                    TrackedEquipment device = new TrackedEquipment();
                     device.setEquipmentTitle("Admin");
-                    client.setDevice(device);
+                    connection.setDevice(device);
                 } else {
                     messageSender.sendMessageWithHeader("Wrong key");
                 }
                 break;
+            //-----------------------------------------------------------------------авторизация в автоматическом режиме
             case "\\auth":
                 if (header.length > 1 && header[1].equals(ClientListenersStarter.getProperties("publicKey"))) {
-                    client.setAuth(true);
+                    connection.setAuth(true);
                     messageSender.sendMessageWithoutHeader("getId");
                 } else {
                     ClientListenersDataBus.disableClient(ctx.channel().localAddress());
                     ctx.disconnect();
                 }
                 break;
+            //---------------------------------------------------------------------------получение ClientID
             case "\\clientID":
                 if (header.length < 2) { //не забыть проверить уникальность ID по базе
                     LOGGER.info("Подключается новое устройство. Присваиваю новый ID");
@@ -78,20 +83,19 @@ public class ChanelListener {
                 } else {
                     uuid = header[1];
                 }
-                ClientListenersDataBus.addConnection(client);
+                ClientListenersDataBus.addConnection(connection);
                 messageSender.sendMessageWithoutHeader("getName");
                 break;
+            //---------------------------------------------------------------------------получение имени клиента
             case "\\clientName":
                 LOGGER.info(String.format("Имя клиента: [%s]", header[1]));
                 deviceInit(ctx, header);
                 messageSender.sendMessageWithoutHeader("getMac");
                 break;
-            case "\\macAddress":
-                LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
-                client.getDevice().setEquipmentMacAddress(header[1]);
-                dbService.updateTrackedEquipment(client.getDevice());
+            //------------------------------------------------------------------------возможность серверного логирования
+            case "\\getSensors":
                 StringBuilder sensors = new StringBuilder();
-                client.getDevice()
+                connection.getDevice()
                         .getTrackedEquipmentSensorsList()
                         .forEach(trackedEquipmentSensors -> sensors.append(" ") // TODO: 23.06.2023 при первом подключении клиента выскакивает nullPointer и соединение обрывается
                                 .append(trackedEquipmentSensors
@@ -99,23 +103,34 @@ public class ChanelListener {
                                         .getSensorTitle()));
                 messageSender.sendMessageWithoutHeader("startSensors" + sensors);
                 break;
+            //---------------------------------------------------------------------------получение MAC-адреса
+            case "\\macAddress":
+                LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
+                connection.getDevice().setEquipmentMacAddress(header[1]);
+                dbService.updateTrackedEquipment(connection.getDevice());
+                messageSender.sendMessageWithoutHeader("slog " + (connection.getDevice().getServerLog()));
+                break;
+            //---------------------------------------------------------------------------выключение сервера
             case "/shutdown":
                 server.shutdown();
                 break;
+            //---------------------------------------------------------------------------управление подключениями
             case "/connections":
                 if (!connections.connectionListOperator(ctx, header)) {
                     LOGGER.info("Bad command");
                 }
                 break;
+            //---------------------------------------------------------------------------управление черным списком
             case "/blacklist":
                 if (!blackList.disabledClientsListOperator(header)) {
                     LOGGER.info("Bad command");
                 }
                 break;
+            //---------------------------------------------------------------------------получение состояния клиента
             case "\\ClientHardwareInfo":  //в процессе доработки
                 ObjectMapper mapper = new ObjectMapper();
                 ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
-                client.getDevice().setDeviceInfo(deviceInfo);
+                connection.getDevice().setDeviceInfo(deviceInfo);
             default:
                 messageSender.sendMessageWithHeader("Unknown command");
                 break;
@@ -135,6 +150,6 @@ public class ChanelListener {
                 .toString()
                 .replace("/", ""));
         dbService.updateTrackedEquipment(device);
-        client.setDevice(device);
+        connection.setDevice(device);
     }
 }

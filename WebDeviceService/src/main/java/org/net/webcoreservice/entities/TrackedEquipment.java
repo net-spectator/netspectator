@@ -38,6 +38,9 @@ public class TrackedEquipment {
     @Column(name = "black_list", columnDefinition = "integer default 0")
     private int blackList;
 
+    @Column(name = "server_log", columnDefinition = "integer default 0")
+    private int serverLog;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
