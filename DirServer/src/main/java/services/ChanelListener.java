@@ -92,7 +92,7 @@ public class ChanelListener {
                 deviceInit(ctx, header);
                 messageSender.sendMessageWithoutHeader("getMac");
                 break;
-            //------------------------------------------------------------------------возможность серверного логирования
+            //------------------------------------------------------------------------включение сенсоров клиента
             case "\\getSensors":
                 StringBuilder sensors = new StringBuilder();
                 connection.getDevice()
@@ -103,7 +103,7 @@ public class ChanelListener {
                                         .getSensorTitle()));
                 messageSender.sendMessageWithoutHeader("startSensors" + sensors);
                 break;
-            //---------------------------------------------------------------------------получение MAC-адреса
+            //-------------------------------------------------------получение MAC-адреса/отправка настроек логирования
             case "\\macAddress":
                 LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
                 connection.getDevice().setEquipmentMacAddress(header[1]);
@@ -127,7 +127,7 @@ public class ChanelListener {
                 }
                 break;
             //---------------------------------------------------------------------------получение состояния клиента
-            case "\\ClientHardwareInfo":  //в процессе доработки
+            case "\\ClientHardwareInfo":
                 ObjectMapper mapper = new ObjectMapper();
                 ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
                 connection.getDevice().setDeviceInfo(deviceInfo);
