@@ -1,7 +1,6 @@
 package readers;
 
 import com.profesorfalken.jsensors.JSensors;
-import com.profesorfalken.jsensors.model.components.Components;
 import com.profesorfalken.jsensors.model.components.Cpu;
 import com.profesorfalken.jsensors.model.sensors.Temperature;
 import entities.devices.Hardware;
@@ -63,6 +62,6 @@ public class CpuInfoCollector implements SensorInfoCollector {
             }
         }
         LOGGER.info(String.format("Дальнейшая запись логов в классе %s не требуется, логер отключен", this.getClass().getSimpleName()));
-        LOGGER.setDisabled(true);
+        LOGGER.setLocalLog(false);
     }
 }

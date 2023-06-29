@@ -7,7 +7,6 @@ import utils.NSLogger;
 import utils.converter.ByteToString;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class RamInfoCollector implements SensorInfoCollector {
@@ -38,6 +37,6 @@ public class RamInfoCollector implements SensorInfoCollector {
         ramList.add(ram);
         LOGGER.info("Информация о состоянии RAM сохранена");
         LOGGER.info(String.format("Дальнейшая запись логов в классе %s не требуется, логер отключен", this.getClass().getSimpleName()));
-        LOGGER.setDisabled(true);
+        LOGGER.setLocalLog(false);
     }
 }

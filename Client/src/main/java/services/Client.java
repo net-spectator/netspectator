@@ -3,6 +3,7 @@ package services;
 
 import config.Logo;
 import org.apache.log4j.Logger;
+import utils.ModuleName;
 import utils.NSLogger;
 import utils.converter.PropertiesOperator;
 
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class Client {
     private DataOutputStream out;
     private DataInputStream in;
@@ -35,7 +35,6 @@ public class Client {
     private ScheduledExecutorService executor;
     private long INIT_DELAY;
     private long EXECUTION_PERIOD;
-
     private static String PROPERTIES_PATH = "client.properties";
     public static Properties properties;
     private static final NSLogger LOGGER = new NSLogger(Client.class);
@@ -138,6 +137,7 @@ public class Client {
     private void automaticModeInit() {
         String[] query;
         boolean keepAlive = true;
+        ModuleName.getModuleName().setName(properties.getProperty("name"));
         try {
             out.write(("\\auth " + properties.getProperty("pub_key")).getBytes());
             while (keepAlive) {
@@ -156,14 +156,18 @@ public class Client {
                         LOGGER.info("Сервер запрашивает имя");
                         out.write(("\\clientName " + properties.getProperty("name")).getBytes());
                         break;
-                    case "startSensors":
-                        executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, EXECUTION_PERIOD, TimeUnit.SECONDS);
-                        break;
                     case "getMac":
                         LOGGER.info("Сервер запрашивает MAC адрес");
                         MACAddress = getMacAddress();
                         LOGGER.info(String.format("MAC адресс текущего устройства - %s", MACAddress));
                         out.write(("\\macAddress " + MACAddress).getBytes());
+                        break;
+                    case "slog":
+                        LOGGER.info(String.format("Логирование на сервер - %s", (query[1].equals("1") ? "включено" : "отключено")));
+                        out.write(("\\getSensors").getBytes());
+                        break;
+                    case "startSensors":
+                        executor.scheduleAtFixedRate(new DeviceListener(out, Arrays.copyOfRange(query, 1, query.length)), INIT_DELAY, EXECUTION_PERIOD, TimeUnit.SECONDS);
                         break;
                     case "close":
                         LOGGER.info("Запрос о перезагрузке клиента");
