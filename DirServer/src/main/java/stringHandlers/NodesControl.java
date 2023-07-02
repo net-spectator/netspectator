@@ -40,18 +40,27 @@ public class NodesControl {
                 messageSender.sendMessageWithHeader(response.length() < 1 ? "empty" : response.toString());
                 break;
             case "scan":
-                if (args.length > 2) {
-                    NodeListener.nodeBroadcastSearch(args[2]);
-                    messageSender.sendMessageWithHeader("Сканирование запущено");
-                } else {
-                    messageSender.sendMessageWithHeader("Ошибка в аргументах");
+                try {
+                    if (args.length > 2) {
+                        NodeListener.nodeBroadcastSearch(args[2]);
+                        messageSender.sendMessageWithHeader("Сканирование запущено");
+                    } else {
+                        messageSender.sendMessageWithHeader("Ошибка в аргументах");
+                    }
+                } catch (NumberFormatException e) {
+                    messageSender.sendMessageWithHeader(String.format("Неверный формат диапазона сети: [%s]", args[2]));
                 }
                 break;
             case "add":
                 try {
-                    if (args.length > 2) {
+                    if (args.length == 3) {
                         NodeListener.addNodeForTracking(Integer.parseInt(args[2]) - 1);
                         messageSender.sendMessageWithHeader("Операция выполнена");
+                    } else if (args.length == 5 && args[3].contains("-n")) {
+                        NodeListener.addNodeForTracking(Integer.parseInt(args[2]) - 1, args[4]);
+                        messageSender.sendMessageWithHeader("Операция выполнена");
+                    } else {
+                        messageSender.sendMessageWithHeader("Неверный набор аргументов");
                     }
                 } catch (IndexOutOfBoundsException | NumberFormatException e) {
                     messageSender.sendMessageWithHeader(String.format("Неверный индекс, индекс должен быть в пределах от 1 до %s", NodeListener.detectedNodesListSize()));

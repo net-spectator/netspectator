@@ -6,7 +6,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.apache.log4j.Logger;
 import utils.NSLogger;
 import utils.converter.PropertiesOperator;
 
@@ -26,7 +25,7 @@ public final class ClientListenersStarter {
 
     public ClientListenersStarter() {
         ClientListenersDataBus.getNettyDataBus();
-        NodeListener.getNodeListener();
+        NodeListener.startNodeListener();
         initParams();
         serverStart();
     }

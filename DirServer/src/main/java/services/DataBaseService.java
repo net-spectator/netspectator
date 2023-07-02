@@ -1,17 +1,21 @@
 package services;
 
+import entities.EquipmentType;
 import entities.TrackedEquipment;
 import enums.Status;
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import utils.NSLogger;
+import utils.converter.CastUtils;
 
 
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.lang.reflect.Executable;
+import java.util.List;
 
 @Transactional
 public class DataBaseService {
@@ -75,31 +79,27 @@ public class DataBaseService {
     }
 
     public static synchronized void updateTrackedEquipment(TrackedEquipment device) {
-        session = factory.getCurrentSession();
-        session.beginTransaction();
-        session.update(device);
-        session.getTransaction().commit();
+        try {
+            session = factory.getCurrentSession();
+            session.beginTransaction();
+            session.update(device);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            LOGGER.error(String.format("Проблемы при обновлении сущности %s", device.getEquipmentTitle()));
+        }
     }
 
     //удаляет выбранное устройство из базы данных
     public static int deleteTrackedEquipment(TrackedEquipment device) {
-
-        return -1;
-    }
-
-    //изменяет статус устройства (мне кажется этот метод не понадобиться
-    //так как после подключения hibernate наблюдает за объектами
-    public static void changeTrackedEquipmentStatus(TrackedEquipment device, Status status) {
-        session = factory.getCurrentSession();
-        session.beginTransaction();
-        TrackedEquipment te = null;
         try {
-            session.update(device);
+            session = factory.getCurrentSession();
+            session.beginTransaction();
+            session.delete(device);
             session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().commit();
-            LOGGER.error(String.format("Объект не обнаружен [%s]", device.getEquipmentTitle()));
+        } catch (HibernateException e) {
+            LOGGER.error(String.format("Проблемы при удалении сущности %s", device.getEquipmentTitle()));
         }
+        return -1;
     }
 
     public static synchronized TrackedEquipment getTrackedNodeByIP(String ipAddress) {
@@ -114,6 +114,21 @@ public class DataBaseService {
         }
         session.getTransaction().commit();
         return te;
+    }
+
+    public static synchronized List<TrackedEquipment> getTrackedNodesListByType(String typeName) {
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        List<TrackedEquipment> te = null;
+        EquipmentType equipmentType = null;
+        try {
+            equipmentType =  (EquipmentType) session.createQuery("from EquipmentType where typeTitle=:title").setParameter("title", typeName).getSingleResult();
+        } catch (NoResultException e) {
+            session.getTransaction().commit();
+            return null;
+        }
+        session.getTransaction().commit();
+        return equipmentType.getTrackedEquipmentList();
     }
 
 }

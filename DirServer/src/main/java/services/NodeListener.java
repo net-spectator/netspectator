@@ -37,20 +37,14 @@ public class NodeListener {
         trackedList = new ArrayList<>();
         detectedNodes = new ArrayList<>();
         executor = Executors.newSingleThreadScheduledExecutor();
+        trackedList = DataBaseService.getTrackedNodesListByType("Nodes");
         startListener();
     }
 
-    public static NodeListener getNodeListener() {
-        NodeListener nl = nodeListener;
-        if (nl == null) {
-            synchronized (NodeListener.class) {
-                nl = nodeListener;
-                if (nl == null) {
-                    nodeListener = nl = new NodeListener();
-                }
-            }
+    public static void startNodeListener() {
+        if (nodeListener == null) {
+            nodeListener = new NodeListener();
         }
-        return nl;
     }
 
     public static List<DetectedNode> getDetectedNodes() {
@@ -79,6 +73,12 @@ public class NodeListener {
         }
     }
 
+    public static synchronized void addNodeForTracking(int index, String name) throws IndexOutOfBoundsException {
+        DetectedNode dn = detectedNodes.get(index);
+        dn.setNodeName(name);
+        addNodeForTracking(index);
+    }
+
     public static boolean checkNode(String ipAddress) {
         int reached = 0;
         try {
@@ -105,7 +105,7 @@ public class NodeListener {
         detectedNodes.add(node);
     }
 
-    private static synchronized void addTrackedNode(TrackedEquipment trackedEquipment){
+    private static synchronized void addTrackedNode(TrackedEquipment trackedEquipment) {
         trackedList.add(trackedEquipment);
     }
 
@@ -123,8 +123,10 @@ public class NodeListener {
                         for (String s : parts) {
                             if (s.contains("-") || s.contains(":")) {
                                 MAC.append(s);
+                                break;
                             }
                         }
+                        break;
                     }
                 }
             }
@@ -149,9 +151,10 @@ public class NodeListener {
         return name.toString();
     }
 
-    public static void nodeBroadcastSearch(String ipRange) { // TODO: 02.07.2023 в дальнейшем добавить калькулятор маски подсети
+    public static void nodeBroadcastSearch(String ipRange) throws NumberFormatException { // TODO: 02.07.2023 в дальнейшем добавить калькулятор маски подсети
         detectedNodes.clear();
         String[] addressArray = ipRange.split("\\.");
+        ipFormatCheck(addressArray);
         StringBuilder addressPrefix = new StringBuilder();
         addressPrefix.append(addressArray[0])
                 .append(".")
@@ -163,8 +166,25 @@ public class NodeListener {
         }
     }
 
-    private void startListener() { // TODO: 02.07.2023 добавить логику чтения отслеживаемых узлов из бд
+    private void startListener() {
         executor.scheduleAtFixedRate(new CheckNodes(), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+    }
+
+    private static void ipFormatCheck(String[] address) throws NumberFormatException {
+        final int[] count = {0};
+        Arrays.stream(address).forEach(s -> {
+            if (ipOctetCheck(Integer.parseInt(s))) {
+                count[0]++;
+            }
+        });
+        if (count[0] == 3) {
+        } else {
+            throw new NumberFormatException();
+        }
+    }
+
+    private static boolean ipOctetCheck(int octet) {
+        return octet < 255 && octet > 0;
     }
 
     private static class CheckNodes implements Runnable {
