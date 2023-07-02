@@ -1,0 +1,14 @@
+#logging:
+#  level:
+#    root: debug
+spring:
+  rabbitmq:
+    host: localhost
+    username: nsmqreader
+    password: 2311
+    virtual-host: ns
+    template:
+      exchange: netspectator-exchange
+mongo:
+  database: netspectator
+  collection: logs

@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Component;
-import users.entities.UserDetails;
+import org.net.usermanage.entities.UserDetails;
+import users.dtos.UserDetailsDTO;
 
 import java.util.*;
 
@@ -28,6 +29,15 @@ public class UserDetailsConverter {
                 auth.getTokenAttributes().get("family_name").toString(),
                 email,
                 userAttributes
+        );
+    }
+
+    public UserDetailsDTO toDTO(UserDetails userDetails) {
+        return new UserDetailsDTO(
+                userDetails.getGivenName(),
+                userDetails.getFamilyName(),
+                userDetails.getEmail(),
+                userDetails.getAttributes()
         );
     }
 }

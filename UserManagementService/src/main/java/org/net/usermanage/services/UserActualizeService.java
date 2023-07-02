@@ -3,13 +3,15 @@ package org.net.usermanage.services;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.net.usermanage.converters.UserConverter;
 import org.net.usermanage.converters.UserDetailsConverter;
 import org.net.usermanage.repositories.UserRepository;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Service;
-import users.entities.Role;
-import users.entities.User;
-import users.entities.UserDetails;
+import org.net.usermanage.entities.Role;
+import org.net.usermanage.entities.User;
+import org.net.usermanage.entities.UserDetails;
+import users.dtos.UserDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +23,7 @@ public class UserActualizeService {
 
     private final UserRepository userRepository;
     private final UserDetailsConverter userDetailsConverter;
+    private final UserConverter userConverter;
 
     private final RoleService roleService;
 
@@ -28,8 +31,8 @@ public class UserActualizeService {
         return userRepository.findByUuid(uuid);
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getUsers() {
+        return userRepository.findAll().stream().map(u -> userConverter.toDTO(u)).collect(Collectors.toList());
     }
 
     public void checkUser(BearerTokenAuthentication auth) {

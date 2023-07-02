@@ -8,12 +8,14 @@ public class ModuleName {
     private ModuleName() {
     }
 
-    public static synchronized ModuleName getModuleName() {
+    public static ModuleName getModuleName() {
         ModuleName mn = moduleName;
         if (mn == null) {
-            mn = moduleName;
-            if (mn == null) {
-                moduleName = mn = new ModuleName();
+            synchronized (ModuleName.class) {
+                mn = moduleName;
+                if (mn == null) {
+                    moduleName = mn = new ModuleName();
+                }
             }
         }
         return mn;

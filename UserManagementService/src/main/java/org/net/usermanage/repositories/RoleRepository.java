@@ -1,7 +1,7 @@
 package org.net.usermanage.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import users.entities.Role;
+import org.net.usermanage.entities.Role;
 
 import java.util.Optional;
 

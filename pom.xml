@@ -15,6 +15,7 @@
         <module>inventory-service</module>
         <module>GatewayService</module>
         <module>UserManagementService</module>
+        <module>LoggerService</module>
     </modules>
 
     <properties>
