@@ -4,6 +4,7 @@ import entities.Connection;
 import services.NodeListener;
 import utils.MessageSender;
 
+import java.text.ParseException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class NodesControl {
@@ -47,8 +48,13 @@ public class NodesControl {
                 }
                 break;
             case "add":
-                if (args.length>2){
-//                    NodeListener.
+                try {
+                    if (args.length > 2) {
+                        NodeListener.addNodeForTracking(Integer.parseInt(args[2]) - 1);
+                        messageSender.sendMessageWithHeader("Операция выполнена");
+                    }
+                } catch (IndexOutOfBoundsException | NumberFormatException e) {
+                    messageSender.sendMessageWithHeader(String.format("Неверный индекс, индекс должен быть в пределах от 1 до %s", NodeListener.detectedNodesListSize()));
                 }
                 break;
             default:

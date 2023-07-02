@@ -11,6 +11,7 @@ import utils.NSLogger;
 
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
+import java.lang.reflect.Executable;
 
 @Transactional
 public class DataBaseService {
@@ -88,8 +89,31 @@ public class DataBaseService {
 
     //изменяет статус устройства (мне кажется этот метод не понадобиться
     //так как после подключения hibernate наблюдает за объектами
-    public static void changeTrackedEquipmentStatus(long device_id, Status status) {
+    public static void changeTrackedEquipmentStatus(TrackedEquipment device, Status status) {
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        TrackedEquipment te = null;
+        try {
+            session.update(device);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().commit();
+            LOGGER.error(String.format("Объект не обнаружен [%s]", device.getEquipmentTitle()));
+        }
+    }
 
+    public static synchronized TrackedEquipment getTrackedNodeByIP(String ipAddress) {
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        TrackedEquipment te = null;
+        try {
+            te = (TrackedEquipment) session.createQuery("from TrackedEquipment where equipmentIpAddress=:ip").setParameter("ip", ipAddress).getSingleResult();
+        } catch (NoResultException e) {
+            session.getTransaction().commit();
+            return null;
+        }
+        session.getTransaction().commit();
+        return te;
     }
 
 }

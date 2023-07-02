@@ -36,7 +36,8 @@ public class NodeListener {
         }
         trackedList = new ArrayList<>();
         detectedNodes = new ArrayList<>();
-//        startListener();
+        executor = Executors.newSingleThreadScheduledExecutor();
+        startListener();
     }
 
     public static NodeListener getNodeListener() {
@@ -56,14 +57,26 @@ public class NodeListener {
         return Collections.unmodifiableList(detectedNodes);
     }
 
-    public static synchronized void addNodeForTracking(int index) {
+    public static int detectedNodesListSize() {
+        return detectedNodes.size();
+    }
+
+    public static synchronized void addNodeForTracking(int index) throws IndexOutOfBoundsException {
         DetectedNode dn = detectedNodes.get(index);
-        TrackedEquipment trackedEquipment = new TrackedEquipment();
-        trackedEquipment.setEquipmentTitle(dn.getNodeName());
-        trackedEquipment.setEquipmentMacAddress(dn.getMACAddress());
-        trackedEquipment.setEquipmentIpAddress(dn.getIpAddress());
-        trackedEquipment.setEquipmentOnlineStatus(ONLINE.getStatus());
-        trackedList.add(trackedEquipment);
+        TrackedEquipment detectedEquipment = new TrackedEquipment();
+        detectedEquipment.setEquipmentTitle(dn.getNodeName());
+        detectedEquipment.setEquipmentMacAddress(dn.getMACAddress());
+        detectedEquipment.setEquipmentIpAddress(dn.getIpAddress());
+        TrackedEquipment foundEquipment = DataBaseService.getTrackedNodeByIP(dn.getIpAddress());
+        if (foundEquipment == null) {
+            detectedEquipment.setEquipmentOnlineStatus(ONLINE.getStatus());
+            DataBaseService.addTrackedEquipment(detectedEquipment);
+            addTrackedNode(detectedEquipment);
+        } else if (!trackedList.contains(foundEquipment)) {
+            foundEquipment.setEquipmentOnlineStatus(ONLINE.getStatus());
+            DataBaseService.updateTrackedEquipment(foundEquipment);
+            addTrackedNode(foundEquipment);
+        }
     }
 
     public static boolean checkNode(String ipAddress) {
@@ -90,6 +103,10 @@ public class NodeListener {
 
     private static synchronized void addSearchedNode(DetectedNode node) {
         detectedNodes.add(node);
+    }
+
+    private static synchronized void addTrackedNode(TrackedEquipment trackedEquipment){
+        trackedList.add(trackedEquipment);
     }
 
     private static String getRemoteMacAddress(String ipAddress) {
@@ -133,6 +150,7 @@ public class NodeListener {
     }
 
     public static void nodeBroadcastSearch(String ipRange) { // TODO: 02.07.2023 в дальнейшем добавить калькулятор маски подсети
+        detectedNodes.clear();
         String[] addressArray = ipRange.split("\\.");
         StringBuilder addressPrefix = new StringBuilder();
         addressPrefix.append(addressArray[0])
@@ -145,7 +163,7 @@ public class NodeListener {
         }
     }
 
-    private void startListener() {
+    private void startListener() { // TODO: 02.07.2023 добавить логику чтения отслеживаемых узлов из бд
         executor.scheduleAtFixedRate(new CheckNodes(), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
     }
 
@@ -156,11 +174,14 @@ public class NodeListener {
                 trackedList.forEach(trackedEquipment -> {
                     boolean isOnline = checkNode(trackedEquipment.getEquipmentIpAddress());
                     if (Objects.equals(trackedEquipment.getEquipmentOnlineStatus(), ONLINE.getStatus()) && !isOnline) {
-                        DataBaseService.changeTrackedEquipmentStatus(trackedEquipment.getId(), OFFLINE);
+                        trackedEquipment.setEquipmentOnlineStatus(OFFLINE.getStatus());
+                        DataBaseService.updateTrackedEquipment(trackedEquipment);
                     }
                     if (Objects.equals(trackedEquipment.getEquipmentOnlineStatus(), OFFLINE.getStatus()) && isOnline) {
-                        DataBaseService.changeTrackedEquipmentStatus(trackedEquipment.getId(), ONLINE);
+                        trackedEquipment.setEquipmentOnlineStatus(ONLINE.getStatus());
+                        DataBaseService.updateTrackedEquipment(trackedEquipment);
                     }
+
                 });
             }
         }
