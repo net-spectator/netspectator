@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import utils.NSLogger;
 
 
 import javax.persistence.NoResultException;
@@ -13,12 +14,17 @@ import javax.transaction.Transactional;
 
 @Transactional
 public class DataBaseService {
-    private static final Logger LOGGER = Logger.getLogger(DataBaseService.class);
+    private static final NSLogger LOGGER = new NSLogger(DataBaseService.class);
 
-    SessionFactory factory = new Configuration() // TODO: 23.06.2023 обеспечить доступ к этому классу из других классов
-            .configure("hibernate.cfg.xml")
-            .buildSessionFactory();
-    Session session = null;
+
+    private static final SessionFactory factory;
+    private static Session session = null;
+
+    static {
+        factory = new Configuration() // TODO: 23.06.2023 обеспечить доступ к этому классу из других классов
+                .configure("hibernate.cfg.xml")
+                .buildSessionFactory();
+    }
 
     //возвращает полный список устройств со статусами
     public static String[] getTrackedEquipmentList() {
@@ -26,14 +32,8 @@ public class DataBaseService {
         return null;
     }
 
-    //возвращает список устройств со статусами по определенной группе
-    public static String[] getTrackedEquipmentListByGroup(String groupName) {
-
-        return null;
-    }
-
     //добавляет новое устройство в базу данных
-    public int addTrackedEquipment(TrackedEquipment device) {
+    public static synchronized int addTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
         try {
             session.beginTransaction();
@@ -45,8 +45,7 @@ public class DataBaseService {
         return 1;
     }
 
-    @Transactional
-    public TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
+    public static synchronized TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment device = null;
@@ -60,7 +59,7 @@ public class DataBaseService {
         return device;
     }
 
-    public void changeDeviceStatus(String uuid, boolean status) {
+    public static synchronized void changeDeviceStatus(String uuid, boolean status) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment device = null;
@@ -74,7 +73,7 @@ public class DataBaseService {
         session.getTransaction().commit();
     }
 
-    public void updateTrackedEquipment(TrackedEquipment device) {
+    public static synchronized void updateTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         session.update(device);

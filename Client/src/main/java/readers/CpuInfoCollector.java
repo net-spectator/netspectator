@@ -22,7 +22,7 @@ public class CpuInfoCollector implements SensorInfoCollector {
     private static NSLogger LOGGER = new NSLogger(CpuInfoCollector.class);
 
     @Override
-    public List<? super Hardware> collectInfo() {
+    public synchronized List<? super Hardware> collectInfo() {
         return Collections.unmodifiableList(cpuList);
     }
 

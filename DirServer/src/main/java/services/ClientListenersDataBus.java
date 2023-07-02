@@ -28,12 +28,14 @@ public class ClientListenersDataBus {
     /**
      * Возвращает singleton текущего объекта
      */
-    public static synchronized ClientListenersDataBus getNettyDataBus() {
+    public static ClientListenersDataBus getNettyDataBus() {
         ClientListenersDataBus nb = nettyDataBus;
         if (nb == null) {
-            nb = nettyDataBus;
-            if (nb == null) {
-                nettyDataBus = nb = new ClientListenersDataBus();
+            synchronized (ClientListenersDataBus.class) {
+                nb = nettyDataBus;
+                if (nb == null) {
+                    nettyDataBus = nb = new ClientListenersDataBus();
+                }
             }
         }
         return nb;

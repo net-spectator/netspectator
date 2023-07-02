@@ -26,6 +26,7 @@ public final class ClientListenersStarter {
 
     public ClientListenersStarter() {
         ClientListenersDataBus.getNettyDataBus();
+        NodeListener.getNodeListener();
         initParams();
         serverStart();
     }
@@ -51,7 +52,7 @@ public final class ClientListenersStarter {
             ChannelFuture future = bootstrap.bind(PORT).sync();
             LOGGER.info("Server start");
             future.channel().closeFuture().sync();
-            System.out.println("Server finished");
+            LOGGER.info("Server finished");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

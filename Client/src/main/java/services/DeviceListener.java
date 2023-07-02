@@ -84,7 +84,7 @@ public class DeviceListener implements Runnable {
                 castClass("readers." + sensorName));
     }
 
-    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) {
+    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) { // TODO: 30.06.2023 рассмотреть возможность замены на статику
         ObjectMapper objectMapper = new ObjectMapper();
         String json;
         try {
@@ -95,7 +95,7 @@ public class DeviceListener implements Runnable {
         }
     }
 
-    private void clientHardwareInfoInit() {
+    private void clientHardwareInfoInit() { // TODO: 30.06.2023 Добавить default IllegalAgrumentException
         clientStaticInfoInit();
         sensors.forEach((key, value) -> {
             switch (key) {

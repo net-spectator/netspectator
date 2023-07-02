@@ -10,12 +10,12 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.RequiredArgsConstructor;
 import stringHandlers.*;
 import org.apache.log4j.Logger;
+import utils.MessageSender;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static enums.Status.OFFLINE;
 import static enums.Status.ONLINE;
 
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class ChanelListener {
     private final DisabledClientsControl blackList;
     private final Connection connection;
     private final ServerControl server;
-    private final DataBaseService dbService;
+    private final NodesControl nodesControl;
     private static final Logger LOGGER = Logger.getLogger(ChanelListener.class);
 
     public void listen(ChannelHandlerContext ctx, Object msg) throws IOException {
@@ -107,7 +107,7 @@ public class ChanelListener {
             case "\\macAddress":
                 LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
                 connection.getDevice().setEquipmentMacAddress(header[1]);
-                dbService.updateTrackedEquipment(connection.getDevice());
+                DataBaseService.updateTrackedEquipment(connection.getDevice());
                 messageSender.sendMessageWithoutHeader("slog " + (connection.getDevice().getServerLog()));
                 break;
             //---------------------------------------------------------------------------выключение сервера
@@ -126,6 +126,10 @@ public class ChanelListener {
                     LOGGER.info("Bad command");
                 }
                 break;
+            //---------------------------------------------------------------------------получение списка сетевых узлов
+            case "/nodes":
+                nodesControl.nodesOperator(header);
+                break;
             //---------------------------------------------------------------------------получение состояния клиента
             case "\\ClientHardwareInfo":
                 ObjectMapper mapper = new ObjectMapper();
@@ -138,18 +142,18 @@ public class ChanelListener {
     }
 
     private void deviceInit(ChannelHandlerContext ctx, String[] args) {
-        TrackedEquipment device = dbService.getTrackedEquipmentByUUID(uuid);  // TODO: 19.06.2023 проверка уникальности клиента должна осуществляться по ip, mac и UUID
+        TrackedEquipment device = DataBaseService.getTrackedEquipmentByUUID(uuid);  // TODO: 19.06.2023 проверка уникальности клиента должна осуществляться по ip, mac и UUID
         if (device == null) {
             device = new TrackedEquipment();
             device.setEquipmentTitle(args[1]);
             device.setEquipmentUuid(uuid);
-            LOGGER.info(dbService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
+            LOGGER.info(DataBaseService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
         }
         device.setEquipmentOnlineStatus(ONLINE.getStatus());
         device.setEquipmentIpAddress(ctx.channel().localAddress()
                 .toString()
                 .replace("/", ""));
-        dbService.updateTrackedEquipment(device);
+        DataBaseService.updateTrackedEquipment(device);
         connection.setDevice(device);
     }
 }
