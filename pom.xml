@@ -17,6 +17,7 @@
         <module>UserManagementService</module>
         <module>WebDeviceService</module>
         <module>NotificationService</module>
+        <module>LoggerService</module>
     </modules>
 
     <properties>

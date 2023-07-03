@@ -1,4 +1,4 @@
-package users.converters;
+package org.net.usermanage.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

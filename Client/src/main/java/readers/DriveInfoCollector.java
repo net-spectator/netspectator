@@ -120,6 +120,6 @@ public class DriveInfoCollector implements SensorInfoCollector {
             LOGGER.error(String.format("Обнаружена ошибка при проверке накопителей - %s", e));
         }
         LOGGER.info(String.format("Дальнейшая запись логов в классе %s не требуется, логер отключен", this.getClass().getSimpleName()));
-        LOGGER.setDisabled(true);
+        LOGGER.setLocalLog(false);
     }
 }

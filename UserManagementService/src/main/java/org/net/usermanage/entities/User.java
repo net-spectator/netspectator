@@ -1,4 +1,4 @@
-package users.entities;
+package org.net.usermanage.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

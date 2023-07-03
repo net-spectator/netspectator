@@ -5,8 +5,7 @@ import java.io.IOException;
 
 public class ClientRun {
     public static void main(String[] args) throws IOException {
-        ModuleName mn = ModuleName.getModuleName();
-        mn.setName("Client");
+        ModuleName.getModuleName().setName("Client");
         new Client();
     }
 }
