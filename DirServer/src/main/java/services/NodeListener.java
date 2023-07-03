@@ -1,5 +1,6 @@
 package services;
 
+import entities.EquipmentType;
 import entities.nodes.DetectedNode;
 import entities.TrackedEquipment;
 import utils.NSLogger;
@@ -21,8 +22,9 @@ public class NodeListener {
     private static long INIT_DELAY = 0; // TODO: 22.06.2023 перенести в clientParams
     private static long PERIOD = 5; // TODO: 22.06.2023 перенести в clientParams
     private static int PING_TIMEOUT = 200; // TODO: 22.06.2023 перенести в clientParams
-    private ScheduledExecutorService executor;
+    private static ScheduledExecutorService scheduledExecutorService;
     private static volatile List<DetectedNode> detectedNodes;
+    private static EquipmentType equipmentType;
     private static NSLogger LOGGER = new NSLogger(NodeListener.class);
     private static String ARP_COMMAND;
 
@@ -36,8 +38,7 @@ public class NodeListener {
         }
         trackedList = new ArrayList<>();
         detectedNodes = new ArrayList<>();
-        executor = Executors.newSingleThreadScheduledExecutor();
-        trackedList = DataBaseService.getTrackedNodesListByType("Nodes");
+        equipmentType = DataBaseService.getEquipmentTypeElement("Nodes");
         startListener();
     }
 
@@ -51,8 +52,16 @@ public class NodeListener {
         return Collections.unmodifiableList(detectedNodes);
     }
 
+    public static List<TrackedEquipment> getTrackedList() {
+        return Collections.unmodifiableList(trackedList);
+    }
+
     public static int detectedNodesListSize() {
         return detectedNodes.size();
+    }
+
+    public static int trackedNodesListSize() {
+        return trackedList.size();
     }
 
     public static synchronized void addNodeForTracking(int index) throws IndexOutOfBoundsException {
@@ -64,6 +73,7 @@ public class NodeListener {
         TrackedEquipment foundEquipment = DataBaseService.getTrackedNodeByIP(dn.getIpAddress());
         if (foundEquipment == null) {
             detectedEquipment.setEquipmentOnlineStatus(ONLINE.getStatus());
+            detectedEquipment.setTypeId(equipmentType);
             DataBaseService.addTrackedEquipment(detectedEquipment);
             addTrackedNode(detectedEquipment);
         } else if (!trackedList.contains(foundEquipment)) {
@@ -77,6 +87,21 @@ public class NodeListener {
         DetectedNode dn = detectedNodes.get(index);
         dn.setNodeName(name);
         addNodeForTracking(index);
+    }
+
+    public static void removeNodeFromTracking(int index) {
+        removeTrackEquipment(trackedList.get(index));
+    }
+
+    public static void removeNodeFromTrackingById(int id) {
+        removeTrackEquipment(trackedList.stream().filter(trackedEquipment -> trackedEquipment.getId() == id)
+                .findFirst()
+                .orElse(null));
+    }
+
+    private static synchronized void removeTrackEquipment(TrackedEquipment trackedEquipment) {
+        DataBaseService.removeTrackedEquipment(trackedEquipment);
+        trackedList.remove(trackedEquipment);
     }
 
     public static boolean checkNode(String ipAddress) {
@@ -166,8 +191,14 @@ public class NodeListener {
         }
     }
 
-    private void startListener() {
-        executor.scheduleAtFixedRate(new CheckNodes(), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+    public static void startListener() {
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        trackedList = DataBaseService.getTrackedNodesListByType("Nodes");
+        scheduledExecutorService.scheduleAtFixedRate(new NodeSpectator(), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+    }
+
+    public static void stopListener() {
+        scheduledExecutorService.shutdown();
     }
 
     private static void ipFormatCheck(String[] address) throws NumberFormatException {
@@ -177,8 +208,7 @@ public class NodeListener {
                 count[0]++;
             }
         });
-        if (count[0] == 3) {
-        } else {
+        if (count[0] < 3) {
             throw new NumberFormatException();
         }
     }
@@ -187,11 +217,12 @@ public class NodeListener {
         return octet < 255 && octet > 0;
     }
 
-    private static class CheckNodes implements Runnable {
+    private static class NodeSpectator implements Runnable {
         @Override
         public void run() {
             if (trackedList.size() > 0) {
                 trackedList.forEach(trackedEquipment -> {
+                    LOGGER.info("Сканирую сеть");
                     boolean isOnline = checkNode(trackedEquipment.getEquipmentIpAddress());
                     if (Objects.equals(trackedEquipment.getEquipmentOnlineStatus(), ONLINE.getStatus()) && !isOnline) {
                         trackedEquipment.setEquipmentOnlineStatus(OFFLINE.getStatus());

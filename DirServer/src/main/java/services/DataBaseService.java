@@ -2,19 +2,16 @@ package services;
 
 import entities.EquipmentType;
 import entities.TrackedEquipment;
-import enums.Status;
-import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import utils.NSLogger;
-import utils.converter.CastUtils;
 
 
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
-import java.lang.reflect.Executable;
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
@@ -48,6 +45,21 @@ public class DataBaseService {
         }
         session.getTransaction().commit();
         return 1;
+    }
+
+    public static synchronized EquipmentType getEquipmentTypeElement(String equipmentType) {
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        List<TrackedEquipment> te = null;
+        EquipmentType et = null;
+        try {
+            et = (EquipmentType) session.createQuery("from EquipmentType where typeTitle=:title").setParameter("title", equipmentType).getSingleResult();
+        } catch (NoResultException e) {
+            session.getTransaction().commit();
+            return null;
+        }
+        session.getTransaction().commit();
+        return et;
     }
 
     public static synchronized TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
@@ -90,7 +102,7 @@ public class DataBaseService {
     }
 
     //удаляет выбранное устройство из базы данных
-    public static int deleteTrackedEquipment(TrackedEquipment device) {
+    public static synchronized int removeTrackedEquipment(TrackedEquipment device) {
         try {
             session = factory.getCurrentSession();
             session.beginTransaction();
@@ -117,17 +129,16 @@ public class DataBaseService {
     }
 
     public static synchronized List<TrackedEquipment> getTrackedNodesListByType(String typeName) {
-        session = factory.getCurrentSession();
-        session.beginTransaction();
-        List<TrackedEquipment> te = null;
         EquipmentType equipmentType = null;
         try {
-            equipmentType =  (EquipmentType) session.createQuery("from EquipmentType where typeTitle=:title").setParameter("title", typeName).getSingleResult();
-        } catch (NoResultException e) {
-            session.getTransaction().commit();
-            return null;
+            equipmentType = getEquipmentTypeElement(typeName);
+            if (equipmentType == null) {
+                return Collections.emptyList();
+            }
+        } catch (HibernateException e) {
+            LOGGER.error(String.format("Возникла проблема при осуществлении запроса поиска типа по имени %s", typeName));
+            return Collections.emptyList();
         }
-        session.getTransaction().commit();
         return equipmentType.getTrackedEquipmentList();
     }
 

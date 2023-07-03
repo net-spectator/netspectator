@@ -18,6 +18,7 @@ public class NodesControl {
 
     public boolean nodesOperator(String[] args) {
         StringBuilder response = new StringBuilder();
+        AtomicInteger finalIndex = new AtomicInteger(1);
 
         if (!client.isAuth()) {
             messageSender.sendMessageWithHeader("Not authorized");
@@ -31,7 +32,6 @@ public class NodesControl {
 
         switch (args[1]) {
             case "detected":
-                AtomicInteger finalIndex = new AtomicInteger(1);
                 NodeListener.getDetectedNodes().forEach(detectedNode -> response
                         .append(finalIndex.getAndIncrement())
                         .append(". ")
@@ -65,6 +65,43 @@ public class NodesControl {
                 } catch (IndexOutOfBoundsException | NumberFormatException e) {
                     messageSender.sendMessageWithHeader(String.format("Неверный индекс, индекс должен быть в пределах от 1 до %s", NodeListener.detectedNodesListSize()));
                 }
+                break;
+            case "tracked":
+                NodeListener.getTrackedList().forEach(trackedEquipment -> response
+                        .append(finalIndex.getAndIncrement())
+                        .append(". ")
+                        .append("Name = ")
+                        .append(trackedEquipment.getEquipmentTitle())
+                        .append(" ; ")
+                        .append("IP = ")
+                        .append(trackedEquipment.getEquipmentIpAddress())
+                        .append(" ; ")
+                        .append("MAC = ")
+                        .append(trackedEquipment.getEquipmentMacAddress())
+                        .append("\n"));
+                messageSender.sendMessageWithHeader(response.length() < 1 ? "empty" : response.toString());
+                break;
+            case "delete":
+                try {
+                    if (args.length == 3) {
+                        NodeListener.removeNodeFromTracking(Integer.parseInt(args[2]) - 1);
+                        messageSender.sendMessageWithHeader("Операция выполнена");
+                    }
+                } catch (NumberFormatException e) {
+                    messageSender.sendMessageWithHeader(String.format("Неверный индекс, индекс должен быть в пределах от 1 до %s", NodeListener.trackedNodesListSize()));
+                }
+                messageSender.sendMessageWithHeader("Команда не выполнена, проверьте аргументы");
+                break;
+            case "tracking":
+                if (args.length == 3 && args[2].equals("stop")) {
+                    NodeListener.stopListener();
+                    messageSender.sendMessageWithHeader("Операция выполнена");
+                }
+                if (args.length == 3 && args[2].equals("start")) {
+                    NodeListener.startListener();
+                    messageSender.sendMessageWithHeader("Операция выполнена");
+                }
+                messageSender.sendMessageWithHeader("Команда не выполнена, проверьте аргументы");
                 break;
             default:
                 messageSender.sendMessageWithHeader("Bad command");
