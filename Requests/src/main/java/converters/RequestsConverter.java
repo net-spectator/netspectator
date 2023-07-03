@@ -2,7 +2,7 @@ package converters;
 
 import entities.Requests;
 import entities.RequestsStatus;
-import entities.devices.requests.RequestsDto;
+import entities.RequestsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,11 @@ public class RequestsConverter {
                 requests.getId(),
                 requests.getTopic(),
                 requests.getDescription(),
-                requests.getRequest_user_id(),
-                requests.getEquipment_id(),
-                requests.getExecutor_user_id(),
-                requests.getExecutor_comments(),
-                requests.getRequest_status());
+                requests.getRequestUserId(),
+                requests.getEquipmentId(),
+                requests.getExecutorUserId(),
+                requests.getExecutorComments(),
+                requests.getRequestsStatus());
     }
 
     public Requests dtoToEntity(RequestsDto requestsDto){
@@ -27,11 +27,11 @@ public class RequestsConverter {
         req.setId(requestsDto.getId());
         req.setTopic(requestsDto.getTopic());
         req.setDescription(requestsDto.getDescription());
-        req.setRequest_user_id(requestsDto.getRequest_user_id());
-        req.setEquipment_id(requestsDto.getEquipment_id());
-        req.setExecutor_user_id(requestsDto.getExecutor_user_id());
-        req.setExecutor_comments(requestsDto.getExecutor_comments());
-        req.setRequest_status(requestsDto.getRequest_status());
+        req.setRequestUserId(requestsDto.getRequestUserId());
+        req.setEquipmentId(requestsDto.getEquipmentId());
+        req.setExecutorUserId(requestsDto.getExecutorUserId());
+        req.setExecutorComments(requestsDto.getExecutorComments());
+        req.setRequestsStatus(requestsDto.getRequestsStatus());
         return req;
     }
 }

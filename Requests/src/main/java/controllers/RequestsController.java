@@ -1,7 +1,7 @@
 package controllers;
 
 import entities.Requests;
-import entities.devices.requests.RequestsDto;
+import entities.RequestsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import services.RequestsService;

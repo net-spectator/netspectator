@@ -23,20 +23,20 @@ public class Requests {
     private String description;
 
     @Column (name = "request_user_id")
-    private long request_user_id;
+    private long requestUserId;
 
     @Column (name = "equipment_id")
-    private long equipment_id;
+    private long equipmentId;
 
     @Column (name = "executor_user_id")
-    private long executor_user_id;
+    private long executorUserId;
 
     @Column (name = "executor_comments")
-    private String executor_comments;
+    private String executorComments;
 
     @ManyToOne
     @Column (name = "request_status_id")
-    private RequestsStatus request_status;
+    private RequestsStatus requestsStatus;
 
     @CreationTimestamp
     @Column (name = "created_at")
@@ -50,11 +50,11 @@ public class Requests {
         setId(builder.id);
         setTopic(builder.topic);
         setDescription(builder.description);
-        setRequest_user_id(builder.request_user_id);
-        setEquipment_id(builder.equipment_id);
-        setExecutor_user_id(builder.executor_user_id);
-        setExecutor_comments(builder.executor_comments);
-        setRequest_status(builder.request_status);
+        setRequestUserId(builder.requestUserId);
+        setEquipmentId(builder.equipmentId);
+        setExecutorUserId(builder.executorUserId);
+        setExecutorComments(builder.executorComments);
+        setRequestsStatus(builder.requestStatus);
         setCreatedAt(builder.createdAt);
         setUpdateAt(builder.updateAt);
     }
@@ -68,11 +68,11 @@ public class Requests {
         private long id;
         private String topic;
         private String description;
-        private long request_user_id;
-        private long equipment_id;
-        private long executor_user_id;
-        private String executor_comments;
-        private RequestsStatus request_status;
+        private long requestUserId;
+        private long equipmentId;
+        private long executorUserId;
+        private String executorComments;
+        private RequestsStatus requestStatus;
         private LocalDateTime createdAt;
         private LocalDateTime updateAt;
 
@@ -98,28 +98,28 @@ public class Requests {
             return this;
         }
 
-        public Builder request_user_id(long request_user_id) {
-            this.request_user_id = request_user_id;
+        public Builder request_user_id(long requestUserId) {
+            this.requestUserId = requestUserId;
             return this;
         }
 
-        public Builder equipment_id(long equipment_id) {
-            this.equipment_id = equipment_id;
+        public Builder equipment_id(long equipmentId) {
+            this.equipmentId = equipmentId;
             return this;
         }
 
-        public Builder executor_user_id(long executor_user_id) {
-            this.executor_user_id = executor_user_id;
+        public Builder executor_user_id(long executorUserId) {
+            this.executorUserId = executorUserId;
             return this;
         }
 
-        public Builder executor_comments(String executor_comments) {
-            this.executor_comments = executor_comments;
+        public Builder executor_comments(String executorComments) {
+            this.executorComments = executorComments;
             return this;
         }
 
-        public Builder request_status(RequestsStatus request_status) {
-            this.request_status = request_status;
+        public Builder request_status(RequestsStatus requestsStatus) {
+            this.requestStatus = requestsStatus;
             return this;
         }
 

@@ -1,10 +1,9 @@
 package services;
 
 import entities.Requests;
-import entities.devices.requests.RequestsDto;
+import entities.RequestsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import repositories.RequestsRepository;
 import repositories.RequestsStatusRepository;
@@ -28,11 +27,11 @@ public class RequestsService {
         Requests requests = Requests.newBuilder()
                 .topic(requestsDto.getTopic())
                 .description(requestsDto.getDescription())
-                .executor_comments(requestsDto.getExecutor_comments())
-                .request_status(requestsDto.getRequest_status())
-                .request_user_id(requestsDto.getRequest_user_id())
-                .request_user_id(requestsDto.getRequest_user_id())
-                .equipment_id(requestsDto.getEquipment_id())
+                .executor_comments(requestsDto.getExecutorComments())
+                .request_status(requestsDto.getRequestsStatus())
+                .request_user_id(requestsDto.getRequestUserId())
+                .request_user_id(requestsDto.getRequestUserId())
+                .equipment_id(requestsDto.getEquipmentId())
                 .build();
         requestsRepository.save(requests);
         return requests;
