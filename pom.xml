@@ -12,7 +12,12 @@
         <module>DirServer</module>
         <module>Client</module>
         <module>api</module>
-        <module>Requests</module>
+        <module>inventory-service</module>
+        <module>GatewayService</module>
+        <module>UserManagementService</module>
+        <module>WebDeviceService</module>
+        <module>NotificationService</module>
+        <module>LoggerService</module>
     </modules>
 
     <properties>

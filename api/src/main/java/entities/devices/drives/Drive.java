@@ -11,7 +11,7 @@ public class Drive extends Hardware {
     @JsonProperty("deviceName")
     private String deviceName;
     @JsonProperty("temperature")
-    private long temperature;
+    private double temperature;
     @JsonProperty("partitions")
     private List<Partition> partitions;
 }

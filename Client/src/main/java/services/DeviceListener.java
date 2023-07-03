@@ -1,32 +1,48 @@
 package services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.devices.ClientHardwareInfo;
-import entities.devices.Hardware;
+import entities.devices.ram.Ram;
+import entities.devices.cpus.Cpu;
 import entities.devices.drives.Drive;
-import readers.DriveInfoCollector;
+import oshi.SystemInfo;
 import readers.SensorInfoCollector;
+import utils.NSLogger;
+import utils.converter.CastUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DeviceListener implements Runnable {
-
     private final HashMap<String, SensorInfoCollector> sensors;
-
+    private static final List<String> unsupportedOsList = Arrays.asList("Mac", "Android");
+    private ClientHardwareInfo chi;
     private final DataOutputStream out;
+    private static boolean supportedOs = false;
+    private static final NSLogger LOGGER = new NSLogger(DeviceListener.class);
 
-    public DeviceListener(DataOutputStream out) {
+    public static boolean isSupportedOs() {
+        return supportedOs;
+    }
+
+    public DeviceListener(DataOutputStream out, String[] sensorsListFromServer) {
+        supportedOs = checkOs();
         sensors = new HashMap<>();
+        chi = new ClientHardwareInfo();
         this.out = out;
-        sensors.put(castClass("readers.DriveInfoCollector").getClass().getSimpleName(),castClass("readers.DriveInfoCollector")); //временный вариант
+        LOGGER.info(String.format("Инициализация сенсоров: %s", Arrays.toString(sensorsListFromServer)));
+        Arrays.stream(sensorsListFromServer).forEach(this::createSensors);
+        LOGGER.info("Сенсоры инициализированы");
+    }
+
+    private boolean checkOs() {
+        String currentOs = System.getProperty("os.name");
+        LOGGER.info(String.format("Используемая OS: %s", currentOs));
+        return unsupportedOsList.stream().noneMatch(currentOs::startsWith);
     }
 
     private void updateSensorsStatement() {
@@ -34,27 +50,14 @@ public class DeviceListener implements Runnable {
     }
 
     @Override
-    public void run() { //ToDo доработать автоматическое создание сенсоров
+    public void run() {
+        chi = new ClientHardwareInfo();
         updateSensorsStatement();
-        ClientHardwareInfo chi = new ClientHardwareInfo();
-        chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json;
-        try {
-            json = objectMapper.writeValueAsString(chi);
-            out.write(("\\" + chi.getClass().getSimpleName() + " " + json).getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        clientHardwareInfoInit();
+        sendClientHardwareInfoToServer(chi);
     }
 
-    public <T> List<T> castList(Class<? extends T> clazz, Collection<?> rawCollection) {
-        try {
-            return rawCollection.stream().map((Function<Object, T>) clazz::cast).collect(Collectors.toList());
-        } catch (ClassCastException e) {
-            return Collections.emptyList();
-        }
-    }
+
 
     public static SensorInfoCollector castClass(String name) {
         Class<?> clazz = null;
@@ -67,5 +70,47 @@ public class DeviceListener implements Runnable {
             throw new RuntimeException(e);
         }
         return (SensorInfoCollector) testClass;
+    }
+
+    private void createSensors(String sensorName) {
+        sensors.put(castClass("readers." + sensorName)
+                        .getClass()
+                        .getSimpleName(),
+                castClass("readers." + sensorName));
+    }
+
+    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) { // TODO: 30.06.2023 рассмотреть возможность замены на статику
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(clientHardwareInfo);
+            out.write(("\\" + clientHardwareInfo.getClass().getSimpleName() + " " + json).getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void clientHardwareInfoInit() { // TODO: 30.06.2023 Добавить default IllegalAgrumentException
+        clientStaticInfoInit();
+        sensors.forEach((key, value) -> {
+            switch (key) {
+                case "DriveInfoCollector":
+                    chi.setDrives(CastUtils.castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
+                    break;
+                case "CpuInfoCollector":
+                    chi.setCpus(CastUtils.castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
+                    break;
+                case "RamInfoCollector":
+                    chi.setRam(CastUtils.castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()).get(0));
+                    break;
+            }
+        });
+    }
+
+    private void clientStaticInfoInit() {
+        SystemInfo systemInfo = new SystemInfo();
+        chi.setOsFamily(systemInfo.getOperatingSystem().toString());
+        chi.setOsManufacture(systemInfo.getOperatingSystem().getManufacturer());
+        chi.setOsVersion(systemInfo.getOperatingSystem().getVersionInfo().getVersion());
     }
 }

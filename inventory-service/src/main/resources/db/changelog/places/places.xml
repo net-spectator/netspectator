@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+		http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet id="Places-1" author="larionov">
+        <preConditions>
+            <not>
+                <tableExists tableName="places"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="places">
+            <column name="id" type="uuid">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="name" type="varchar(150)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="varchar(300)"/>
+
+            <column name="parent_id" type="uuid"/>
+
+            <column name="registration_id" type="bigint"/>
+
+        </createTable>
+
+        <addPrimaryKey tableName="places" columnNames="id" constraintName="places.pk"/>
+        
+        <addForeignKeyConstraint baseTableName="places" baseColumnNames="parent_id" constraintName="place-parent_fk" referencedTableName="places"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="places" baseColumnNames="registration_id" constraintName="places_registration_id" referencedTableName="registration_numbers"
+                                 referencedColumnNames="id"/>
+
+        <sql>
+            ALTER TABLE places ADD CONSTRAINT parent_id_must_not_equals_this_id CHECK (id != parent_id)
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,32 @@
+server:
+  port: 8190
+  servlet:
+    context-path: /notification
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/notifications
+    username: postgres
+    password: root
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: netspectator0000@gmail.com
+    password: mhyuzktmiahlgzec
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    sender:
+      email: netspectator0000@gmail.com
+      text: no-reply
