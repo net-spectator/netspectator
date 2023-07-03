@@ -1,4 +1,4 @@
-https://github.com/alex-crs/NetSpectator/blob/master/spider.png
+[https://github.com/alex-crs/NetSpectator/blob/master/spider.png](https://raw.githubusercontent.com/alex-crs/NetSpectator/master/spider.png)
 
 #Net_spectator
 
