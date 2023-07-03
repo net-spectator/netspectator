@@ -9,6 +9,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public final class LogEvent {
+
     public static final String LOG_ID = "_id";
     public static final String LOG_TIME = "_createDate";
     public static final String APP = "_app";
