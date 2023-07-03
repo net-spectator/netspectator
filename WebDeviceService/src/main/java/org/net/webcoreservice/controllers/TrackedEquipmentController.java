@@ -1,6 +1,7 @@
 package org.net.webcoreservice.controllers;
 
 import entities.devices.ClientHardwareInfo;
+import entities.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.converters.TrackedEquipmentConverter;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
@@ -33,6 +34,30 @@ public class TrackedEquipmentController {
     public ClientHardwareInfo getHardwareInfo(@PathVariable Long id) {
         LOGGER.info("Сработал логгер");
         return trackedEquipmentService.getEquipmentHardwareInfo(id);
+    }
+
+    @GetMapping("/broadcastSearch")
+    public void search(@RequestParam String ip) {
+        trackedEquipmentService.scanNetwork(ip);
+    }
+
+    @GetMapping("/nodes")
+    public List<DetectedNode> getAllNodes() {
+        return trackedEquipmentService.getNodes();
+    }
+
+    @PostMapping("/addToScan")
+    public void addToScan(@RequestParam int index, @RequestParam(required = false) String newName) {
+        if (newName.isEmpty()) {
+            trackedEquipmentService.addNodesByIndex(index);
+        } else {
+            trackedEquipmentService.addNodesWithChangeName(index, newName);
+        }
+    }
+
+    @DeleteMapping("/removeNode/{id}")
+    public void removeFromNode(@PathVariable int id) {
+        trackedEquipmentService.removeNodeFromTrEq(id);
     }
 
     @PostMapping("/disconnect/{id}")
