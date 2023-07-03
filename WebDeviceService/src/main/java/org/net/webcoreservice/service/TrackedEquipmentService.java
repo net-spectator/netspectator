@@ -1,6 +1,7 @@
 package org.net.webcoreservice.service;
 
 import entities.devices.ClientHardwareInfo;
+import entities.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.Enum.BlackListStatus;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
@@ -8,6 +9,7 @@ import org.net.webcoreservice.entities.TrackedEquipment;
 import org.net.webcoreservice.repository.TrackedEquipmentRepository;
 import org.springframework.stereotype.Service;
 import services.ClientListenersDataBus;
+import services.NodeListener;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +51,23 @@ public class TrackedEquipmentService {
 
     public ClientHardwareInfo getEquipmentHardwareInfo(Long id) {
         return ClientListenersDataBus.getClientHardwareInfo(id);
+    }
+
+    public List<DetectedNode> scanNetwork(String ip) {
+        NodeListener.nodeBroadcastSearch(ip);
+        return NodeListener.getDetectedNodes();
+    }
+
+    public void addNodesByIndex(int index) {
+        NodeListener.addNodeForTracking(index);
+    }
+
+    public void addNodesWithChangeName(int index, String newName) {
+        NodeListener.addNodeForTracking(index, newName);
+    }
+
+    public void removeNodeFromTrEq(int id) {
+        NodeListener.removeNodeFromTrackingById(id);
     }
 
     public void createNewTrackedEquipment(TrackedEquipmentDto trackedEquipmentDto) {
