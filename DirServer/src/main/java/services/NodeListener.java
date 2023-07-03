@@ -48,10 +48,12 @@ public class NodeListener {
         }
     }
 
+    //возвращает обнаруженные узлы после начала сканирования сети
     public static List<DetectedNode> getDetectedNodes() {
         return Collections.unmodifiableList(detectedNodes);
     }
 
+    //получать список отслеживаемых устройств
     public static List<TrackedEquipment> getTrackedList() {
         return Collections.unmodifiableList(trackedList);
     }
@@ -64,6 +66,7 @@ public class NodeListener {
         return trackedList.size();
     }
 
+    //добавляет обнаруженный узел на отслеживание
     public static synchronized void addNodeForTracking(int index) throws IndexOutOfBoundsException {
         DetectedNode dn = detectedNodes.get(index);
         TrackedEquipment detectedEquipment = new TrackedEquipment();
@@ -83,12 +86,14 @@ public class NodeListener {
         }
     }
 
+    //добавляет обнаруженный узел с изменением его имени
     public static synchronized void addNodeForTracking(int index, String name) throws IndexOutOfBoundsException {
         DetectedNode dn = detectedNodes.get(index);
         dn.setNodeName(name);
         addNodeForTracking(index);
     }
 
+    //удаление из отслеживания по индексу
     public static void removeNodeFromTracking(int index) {
         removeTrackEquipment(trackedList.get(index));
     }
@@ -104,6 +109,7 @@ public class NodeListener {
         trackedList.remove(trackedEquipment);
     }
 
+    //пингует узел и возвращает его состояние доступности
     public static boolean checkNode(String ipAddress) {
         int reached = 0;
         try {
@@ -176,6 +182,7 @@ public class NodeListener {
         return name.toString();
     }
 
+    //сканирует сеть на доступные узлы 192.168.1.0
     public static void nodeBroadcastSearch(String ipRange) throws NumberFormatException { // TODO: 02.07.2023 в дальнейшем добавить калькулятор маски подсети
         detectedNodes.clear();
         String[] addressArray = ipRange.split("\\.");
@@ -222,7 +229,6 @@ public class NodeListener {
         public void run() {
             if (trackedList.size() > 0) {
                 trackedList.forEach(trackedEquipment -> {
-                    LOGGER.info("Сканирую сеть");
                     boolean isOnline = checkNode(trackedEquipment.getEquipmentIpAddress());
                     if (Objects.equals(trackedEquipment.getEquipmentOnlineStatus(), ONLINE.getStatus()) && !isOnline) {
                         trackedEquipment.setEquipmentOnlineStatus(OFFLINE.getStatus());
