@@ -8,6 +8,7 @@ import entities.devices.drives.Drive;
 import oshi.SystemInfo;
 import readers.SensorInfoCollector;
 import utils.NSLogger;
+import utils.converter.CastUtils;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -56,13 +57,7 @@ public class DeviceListener implements Runnable {
         sendClientHardwareInfoToServer(chi);
     }
 
-    public <T> List<T> castList(Class<? extends T> clazz, Collection<?> rawCollection) {
-        try {
-            return rawCollection.stream().map((Function<Object, T>) clazz::cast).collect(Collectors.toList());
-        } catch (ClassCastException e) {
-            return Collections.emptyList();
-        }
-    }
+
 
     public static SensorInfoCollector castClass(String name) {
         Class<?> clazz = null;
@@ -84,7 +79,7 @@ public class DeviceListener implements Runnable {
                 castClass("readers." + sensorName));
     }
 
-    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) {
+    private void sendClientHardwareInfoToServer(ClientHardwareInfo clientHardwareInfo) { // TODO: 30.06.2023 рассмотреть возможность замены на статику
         ObjectMapper objectMapper = new ObjectMapper();
         String json;
         try {
@@ -95,18 +90,18 @@ public class DeviceListener implements Runnable {
         }
     }
 
-    private void clientHardwareInfoInit() {
+    private void clientHardwareInfoInit() { // TODO: 30.06.2023 Добавить default IllegalAgrumentException
         clientStaticInfoInit();
         sensors.forEach((key, value) -> {
             switch (key) {
                 case "DriveInfoCollector":
-                    chi.setDrives(castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
+                    chi.setDrives(CastUtils.castList(Drive.class, sensors.get("DriveInfoCollector").collectInfo()));
                     break;
                 case "CpuInfoCollector":
-                    chi.setCpus(castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
+                    chi.setCpus(CastUtils.castList(Cpu.class, sensors.get("CpuInfoCollector").collectInfo()));
                     break;
                 case "RamInfoCollector":
-                    chi.setRam(castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()).get(0));
+                    chi.setRam(CastUtils.castList(Ram.class, sensors.get("RamInfoCollector").collectInfo()).get(0));
                     break;
             }
         });

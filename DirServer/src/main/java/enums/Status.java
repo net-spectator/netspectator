@@ -1,8 +1,8 @@
 package enums;
 
 public enum Status {
-    ONLINE(1),
-    OFFLINE(2);
+    OFFLINE(0),
+    ONLINE(1);
     private final Integer status;
 
     Status(Integer status) {

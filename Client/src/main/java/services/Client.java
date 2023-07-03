@@ -43,7 +43,6 @@ public class Client {
         executor = Executors.newSingleThreadScheduledExecutor();
         paramsInit();
 
-
         while (true) {
             LOGGER.info(String.format("Попытка установить соединение с сервером [%s:%s]", ADDRESS, PORT));
             tryToConnect();
@@ -242,7 +241,7 @@ public class Client {
             Process pid = Runtime.getRuntime().exec(command);
             BufferedReader in = new BufferedReader(new InputStreamReader(pid.getInputStream()));
             Pattern p = Pattern.compile("([\\w]{1,2}(-|:)){5}[\\w]{1,2}");
-            while (true) {
+            while (true) {  // TODO: 30.06.2023 Пересмотреть логику цикла
                 String line = in.readLine();
                 if (line == null)
                     break;

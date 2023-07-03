@@ -1,4 +1,4 @@
-package stringHandlers;
+package utils;
 
 import entities.Connection;
 import io.netty.buffer.Unpooled;

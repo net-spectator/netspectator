@@ -1,24 +1,32 @@
 package services;
 
+import entities.EquipmentType;
 import entities.TrackedEquipment;
-import enums.Status;
-import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import utils.NSLogger;
 
 
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
+import java.util.Collections;
+import java.util.List;
 
 @Transactional
 public class DataBaseService {
-    private static final Logger LOGGER = Logger.getLogger(DataBaseService.class);
+    private static final NSLogger LOGGER = new NSLogger(DataBaseService.class);
 
-    SessionFactory factory = new Configuration() // TODO: 23.06.2023 обеспечить доступ к этому классу из других классов
-            .configure("hibernate.cfg.xml")
-            .buildSessionFactory();
-    Session session = null;
+
+    private static final SessionFactory factory;
+    private static Session session = null;
+
+    static {
+        factory = new Configuration() // TODO: 23.06.2023 обеспечить доступ к этому классу из других классов
+                .configure("hibernate.cfg.xml")
+                .buildSessionFactory();
+    }
 
     //возвращает полный список устройств со статусами
     public static String[] getTrackedEquipmentList() {
@@ -26,14 +34,8 @@ public class DataBaseService {
         return null;
     }
 
-    //возвращает список устройств со статусами по определенной группе
-    public static String[] getTrackedEquipmentListByGroup(String groupName) {
-
-        return null;
-    }
-
     //добавляет новое устройство в базу данных
-    public int addTrackedEquipment(TrackedEquipment device) {
+    public static synchronized int addTrackedEquipment(TrackedEquipment device) {
         session = factory.getCurrentSession();
         try {
             session.beginTransaction();
@@ -45,8 +47,22 @@ public class DataBaseService {
         return 1;
     }
 
-    @Transactional
-    public TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
+    public static synchronized EquipmentType getEquipmentTypeElement(String equipmentType) {
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        List<TrackedEquipment> te = null;
+        EquipmentType et = null;
+        try {
+            et = (EquipmentType) session.createQuery("from EquipmentType where typeTitle=:title").setParameter("title", equipmentType).getSingleResult();
+        } catch (NoResultException e) {
+            session.getTransaction().commit();
+            return null;
+        }
+        session.getTransaction().commit();
+        return et;
+    }
+
+    public static synchronized TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment device = null;
@@ -60,7 +76,7 @@ public class DataBaseService {
         return device;
     }
 
-    public void changeDeviceStatus(String uuid, boolean status) {
+    public static synchronized void changeDeviceStatus(String uuid, boolean status) {
         session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment device = null;
@@ -74,23 +90,56 @@ public class DataBaseService {
         session.getTransaction().commit();
     }
 
-    public void updateTrackedEquipment(TrackedEquipment device) {
-        session = factory.getCurrentSession();
-        session.beginTransaction();
-        session.update(device);
-        session.getTransaction().commit();
+    public static synchronized void updateTrackedEquipment(TrackedEquipment device) {
+        try {
+            session = factory.getCurrentSession();
+            session.beginTransaction();
+            session.update(device);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            LOGGER.error(String.format("Проблемы при обновлении сущности %s", device.getEquipmentTitle()));
+        }
     }
 
     //удаляет выбранное устройство из базы данных
-    public static int deleteTrackedEquipment(TrackedEquipment device) {
-
+    public static synchronized int removeTrackedEquipment(TrackedEquipment device) {
+        try {
+            session = factory.getCurrentSession();
+            session.beginTransaction();
+            session.delete(device);
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            LOGGER.error(String.format("Проблемы при удалении сущности %s", device.getEquipmentTitle()));
+        }
         return -1;
     }
 
-    //изменяет статус устройства (мне кажется этот метод не понадобиться
-    //так как после подключения hibernate наблюдает за объектами
-    public static void changeTrackedEquipmentStatus(long device_id, Status status) {
+    public static synchronized TrackedEquipment getTrackedNodeByIP(String ipAddress) {
+        session = factory.getCurrentSession();
+        session.beginTransaction();
+        TrackedEquipment te = null;
+        try {
+            te = (TrackedEquipment) session.createQuery("from TrackedEquipment where equipmentIpAddress=:ip").setParameter("ip", ipAddress).getSingleResult();
+        } catch (NoResultException e) {
+            session.getTransaction().commit();
+            return null;
+        }
+        session.getTransaction().commit();
+        return te;
+    }
 
+    public static synchronized List<TrackedEquipment> getTrackedNodesListByType(String typeName) {
+        EquipmentType equipmentType = null;
+        try {
+            equipmentType = getEquipmentTypeElement(typeName);
+            if (equipmentType == null) {
+                return Collections.emptyList();
+            }
+        } catch (HibernateException e) {
+            LOGGER.error(String.format("Возникла проблема при осуществлении запроса поиска типа по имени %s", typeName));
+            return Collections.emptyList();
+        }
+        return equipmentType.getTrackedEquipmentList();
     }
 
 }

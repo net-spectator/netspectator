@@ -8,6 +8,7 @@ import services.DataBaseService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.log4j.Logger;
+import utils.MessageSender;
 
 public class MainHandler extends ChannelInboundHandlerAdapter {
     private ChanelListener chanelListener;
@@ -33,7 +34,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        dbService.changeDeviceStatus(client.getDevice().getEquipmentUuid(), false);
+        DataBaseService.changeDeviceStatus(client.getDevice().getEquipmentUuid(), false); // TODO: 02.07.2023 Тут кака то лажа с NULL pointer
         if (ClientListenersDataBus.disconnectClient(client)) {
             LOGGER.info(String.format("Client [%s] successfully removed", client.getDevice().getEquipmentTitle()));
             LOGGER.info(String.format("Client [%s] disconnected", client.getDevice().getEquipmentTitle()));
@@ -48,12 +49,17 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     private void connectionInit(ChannelHandlerContext ctx) {
         client = new Connection(ctx);
-        dbService = new DataBaseService();
         MessageSender messageSender = new MessageSender(ctx, client);
         DisabledClientsControl blackList = new DisabledClientsControl(messageSender, client);
+        NodesControl nodesControl = new NodesControl(messageSender, client);
         ServerControl server = new ServerControl(messageSender, client);
         ConnectionsList connectionsList = new ConnectionsList(messageSender, blackList, client);
-        chanelListener = new ChanelListener(messageSender, connectionsList, blackList, client, server, dbService);
+        chanelListener = new ChanelListener(messageSender, // TODO: 02.07.2023 заменить логику добавления слушателей по примеру паттерна Chain
+                connectionsList,
+                blackList,
+                client,
+                server,
+                nodesControl);
     }
 }
 

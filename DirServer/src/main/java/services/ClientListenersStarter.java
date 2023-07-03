@@ -6,7 +6,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.apache.log4j.Logger;
 import utils.NSLogger;
 import utils.converter.PropertiesOperator;
 
@@ -26,6 +25,7 @@ public final class ClientListenersStarter {
 
     public ClientListenersStarter() {
         ClientListenersDataBus.getNettyDataBus();
+        NodeListener.startNodeListener();
         initParams();
         serverStart();
     }
@@ -51,7 +51,7 @@ public final class ClientListenersStarter {
             ChannelFuture future = bootstrap.bind(PORT).sync();
             LOGGER.info("Server start");
             future.channel().closeFuture().sync();
-            System.out.println("Server finished");
+            LOGGER.info("Server finished");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

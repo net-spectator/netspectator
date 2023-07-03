@@ -35,7 +35,7 @@ public class DriveInfoCollector implements SensorInfoCollector {
     }
 
     @Override
-    public List<? super Hardware> collectInfo() {
+    public synchronized List<? super Hardware> collectInfo() {
         return Collections.unmodifiableList(hardware);
     }
 
