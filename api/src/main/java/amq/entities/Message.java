@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {
+    private String logTime;
     private LogEvent logEvent;
     private String moduleName;
     private String level;
