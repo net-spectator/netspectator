@@ -36,9 +36,14 @@ public class TrackedEquipmentController {
         return trackedEquipmentService.getEquipmentHardwareInfo(id);
     }
 
-    @GetMapping("/scan")
-    public List<DetectedNode> scan(@RequestParam String ip) {
-        return trackedEquipmentService.scanNetwork(ip);
+    @GetMapping("/broadcastSearch")
+    public void search(@RequestParam String ip) {
+        trackedEquipmentService.scanNetwork(ip);
+    }
+
+    @GetMapping("/nodes")
+    public List<DetectedNode> getAllNodes() {
+        return trackedEquipmentService.getNodes();
     }
 
     @PostMapping("/addToScan")

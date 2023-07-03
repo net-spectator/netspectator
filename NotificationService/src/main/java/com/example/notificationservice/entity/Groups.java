@@ -3,6 +3,7 @@ package com.example.notificationservice.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -15,7 +16,7 @@ public class Groups {
     private Long id;
 
     @Column(name = "user_uuid")
-    private String userUuid;
+    private UUID userUuid;
 
     @ManyToOne
     @JoinColumn(name = "type_id")

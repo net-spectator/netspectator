@@ -53,8 +53,11 @@ public class TrackedEquipmentService {
         return ClientListenersDataBus.getClientHardwareInfo(id);
     }
 
-    public List<DetectedNode> scanNetwork(String ip) {
+    public void scanNetwork(String ip) {
         NodeListener.nodeBroadcastSearch(ip);
+    }
+
+    public List<DetectedNode> getNodes(){
         return NodeListener.getDetectedNodes();
     }
 

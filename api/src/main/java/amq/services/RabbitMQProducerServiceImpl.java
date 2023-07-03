@@ -1,5 +1,6 @@
 package amq.services;
 
+import amq.entities.NotificationMessage;
 import org.springframework.amqp.rabbit.core.*;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,10 @@ public class RabbitMQProducerServiceImpl implements RabbitMQProducerService {
     }
 
     public void sendMessage(Object message, String routingKey) {
+        rabbitTemplate.convertAndSend(exchange, routingKey, message);
+    }
+
+    public void sendNotification(NotificationMessage message, String routingKey) {
         rabbitTemplate.convertAndSend(exchange, routingKey, message);
     }
 }
