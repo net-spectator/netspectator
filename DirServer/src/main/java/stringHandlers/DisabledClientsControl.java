@@ -1,6 +1,7 @@
 package stringHandlers;
 
 import entities.Connection;
+import enums.Help;
 import services.ClientListenersDataBus;
 import utils.MessageSender;
 
@@ -68,6 +69,9 @@ public class DisabledClientsControl {
                 }
                 messageSender.sendMessageWithHeader("Operation complete");
                 return true;
+            case "?":
+                messageSender.sendMessageWithHeader(Help.getDisconnectedHelp());
+                break;
             default:
                 messageSender.sendMessageWithHeader("Bad command");
                 break;

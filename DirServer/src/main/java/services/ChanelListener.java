@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Connection;
 import entities.TrackedEquipment;
 import entities.devices.ClientHardwareInfo;
+import enums.Help;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -121,7 +122,7 @@ public class ChanelListener {
                 }
                 break;
             //---------------------------------------------------------------------------управление черным списком
-            case "/blacklist":
+            case "/disconnected":
                 if (!blackList.disabledClientsListOperator(header)) {
                     LOGGER.info("Bad command");
                 }
@@ -130,11 +131,15 @@ public class ChanelListener {
             case "/nodes":
                 nodesControl.nodesOperator(header);
                 break;
+            case "/?":
+                messageSender.sendMessageWithHeader(Help.getRootHelp());
+                break;
             //---------------------------------------------------------------------------получение состояния клиента
             case "\\ClientHardwareInfo":
                 ObjectMapper mapper = new ObjectMapper();
                 ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
                 connection.getDevice().setDeviceInfo(deviceInfo);
+                break;
             default:
                 messageSender.sendMessageWithHeader("Unknown command");
                 break;

@@ -120,7 +120,7 @@ public class Client {
                 command.delete(0, command.length());
                 command.append(queryStringListener());
                 System.out.print(command);
-                if (command.toString().contains("shutdown")) {
+                if (command.toString().equals("shutdown")) {
                     break;
                 }
                 command.delete(0, command.length());

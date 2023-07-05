@@ -1,6 +1,7 @@
 package stringHandlers;
 
 import entities.Connection;
+import enums.Help;
 import services.NodeListener;
 import utils.MessageSender;
 
@@ -81,7 +82,7 @@ public class NodesControl {
                         .append("\n"));
                 messageSender.sendMessageWithHeader(response.length() < 1 ? "empty" : response.toString());
                 break;
-            case "delete":
+            case "remove":
                 try {
                     if (args.length == 3) {
                         NodeListener.removeNodeFromTracking(Integer.parseInt(args[2]) - 1);
@@ -94,14 +95,23 @@ public class NodesControl {
                 break;
             case "tracking":
                 if (args.length == 3 && args[2].equals("stop")) {
-                    NodeListener.stopListener();
-                    messageSender.sendMessageWithHeader("Операция выполнена");
+                    if (NodeListener.stopListener()) {
+                        messageSender.sendMessageWithHeader("Операция выполнена");
+                    } else {
+                        messageSender.sendMessageWithHeader("Сервис уже остановлен");
+                    }
                 }
                 if (args.length == 3 && args[2].equals("start")) {
-                    NodeListener.startListener();
-                    messageSender.sendMessageWithHeader("Операция выполнена");
+                    if (NodeListener.startListener()) {
+                        messageSender.sendMessageWithHeader("Операция выполнена");
+                    } else {
+                        messageSender.sendMessageWithHeader("Сервис уже запущен");
+                    }
                 }
                 messageSender.sendMessageWithHeader("Команда не выполнена, проверьте аргументы");
+                break;
+            case "?":
+                messageSender.sendMessageWithHeader(Help.getCNodesHelp());
                 break;
             default:
                 messageSender.sendMessageWithHeader("Bad command");

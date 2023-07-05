@@ -27,7 +27,7 @@ public class NodeListener {
     private static EquipmentType equipmentType;
     private static NSLogger LOGGER = new NSLogger(NodeListener.class);
     private static String ARP_COMMAND;
-
+    private static boolean tracking;
     private static ExecutorService pool = Executors.newFixedThreadPool(100);
 
     private NodeListener() {
@@ -198,14 +198,26 @@ public class NodeListener {
         }
     }
 
-    public static void startListener() {
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        trackedList = DataBaseService.getTrackedNodesListByType("Nodes");
-        scheduledExecutorService.scheduleAtFixedRate(new NodeSpectator(), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+    public static boolean startListener() {
+        if (!tracking) {
+            scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            trackedList = DataBaseService.getTrackedNodesListByType("Nodes");
+            scheduledExecutorService.scheduleAtFixedRate(new NodeSpectator(), INIT_DELAY, PERIOD, TimeUnit.SECONDS);
+            tracking = true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public static void stopListener() {
-        scheduledExecutorService.shutdown();
+    public static boolean stopListener() {
+        if (tracking) {
+            scheduledExecutorService.shutdown();
+            tracking = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private static void ipFormatCheck(String[] address) throws NumberFormatException {
