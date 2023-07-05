@@ -2,6 +2,7 @@ package enums;
 
 import java.util.HashMap;
 
+//Не Enum, но очень похож по содержимому
 public class Help {
     private static final HashMap<String, String> connections;
     private static final HashMap<String, String> disconnected;
@@ -60,7 +61,7 @@ public class Help {
     }
 
     /**
-     * формирует список команд help
+     * формирует список команд help с header
      */
     private static String helpBuilder(HashMap<String, String> map) {
         StringBuilder sb = new StringBuilder();
@@ -76,7 +77,7 @@ public class Help {
     }
 
     /**
-     * осуществляет поиск самого длинного ключа в мапе
+     * осуществляет поиск самого длинного ключа в map
      */
     private static int getLongerKey(HashMap<String, String> map) {
         final int[] longerKeyLength = {0};
