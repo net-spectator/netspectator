@@ -26,6 +26,7 @@ spring:
         size: 5
 check-delay: 60000
 realm: netspectator
+type-attribute: ns_user
 keycloak:
   management:
     props:

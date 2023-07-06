@@ -27,10 +27,14 @@ public class KeycloakService {
 
   @Value("${realm}")
   private String realm;
+
+  @Value("${type-attribute}")
+  private String type;
+
   private Map<String, Object> attributes;
 
   public List<UserRepresentation> getUsers() {
-    return keycloak.realm(realm).users().searchByAttributes("type:ns_user");
+    return keycloak.realm(realm).users().searchByAttributes("type:" + type);
   }
 
   public List<Role> getMappedRoles(String id) {
