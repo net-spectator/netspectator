@@ -5,6 +5,7 @@ import entities.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.converters.TrackedEquipmentConverter;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
+import org.net.webcoreservice.entities.TrackedEquipment;
 import org.net.webcoreservice.exeptions.ResourceNotFoundException;
 import org.net.webcoreservice.service.TrackedEquipmentService;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,7 @@ public class TrackedEquipmentController {
     }
 
     @PostMapping("/addToScan")
+    @ResponseStatus(HttpStatus.CREATED)
     public void addToScan(@RequestParam int index, @RequestParam(required = false) String newName) {
         if (newName.isEmpty()) {
             trackedEquipmentService.addNodesByIndex(index);
@@ -56,6 +58,7 @@ public class TrackedEquipmentController {
     }
 
     @DeleteMapping("/removeNode/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFromNode(@PathVariable int id) {
         trackedEquipmentService.removeNodeFromTrEq(id);
     }
@@ -71,19 +74,14 @@ public class TrackedEquipmentController {
     }
 
     @PutMapping("/addBlackList/{id}")
-    public ResponseEntity<?> addClientToBlackList(@PathVariable Long id) {
-        if (!trackedEquipmentService.isExist(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void addClientToBlackList(@PathVariable Long id) {
         trackedEquipmentService.addToBlackList(id);
-        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/removeBlackList/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> removeClientToBlackList(@PathVariable Long id) {
-        if (!trackedEquipmentService.isExist(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         trackedEquipmentService.removeFromBlackList(id);
         return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
@@ -96,12 +94,14 @@ public class TrackedEquipmentController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createNewEquipment(@RequestBody TrackedEquipmentDto trackedEquipmentDto) {
-        trackedEquipmentService.createNewTrackedEquipment(trackedEquipmentDto);
+    public ResponseEntity<TrackedEquipmentDto> createNewEquipment(@RequestBody TrackedEquipmentDto trackedEquipmentDto) {
+        TrackedEquipment trackedEquipment = trackedEquipmentService.createNewTrackedEquipment(trackedEquipmentDto);
+        TrackedEquipmentDto createdTrackedEqDto = converter.entityToDto(trackedEquipment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTrackedEqDto);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {
         trackedEquipmentService.deleteById(id);
     }

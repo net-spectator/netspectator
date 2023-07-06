@@ -3,9 +3,11 @@ package org.net.webcoreservice.controllers;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.converters.SensorsConverter;
 import org.net.webcoreservice.dto.SensorDto;
+import org.net.webcoreservice.entities.Sensors;
 import org.net.webcoreservice.exeptions.ResourceNotFoundException;
 import org.net.webcoreservice.service.SensorsService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,12 +33,15 @@ public class SensorsController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createNewSensor(@RequestBody SensorDto sensorDto) {
-        sensorsService.createNewSensor(sensorDto);
+    @ResponseBody
+    public ResponseEntity<SensorDto> createNewSensor(@RequestBody SensorDto sensorDto) {
+        Sensors sensor = sensorsService.createNewSensor(sensorDto);
+        SensorDto createdSensorDto = sensorsConverter.entityToDto(sensor);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSensorDto);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSensorById(@PathVariable Long id) {
         sensorsService.deleteById(id);
     }

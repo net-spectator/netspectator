@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.Enum.BlackListStatus;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
 import org.net.webcoreservice.entities.TrackedEquipment;
+import org.net.webcoreservice.exeptions.ResourceNotFoundException;
 import org.net.webcoreservice.repository.TrackedEquipmentRepository;
 import org.springframework.stereotype.Service;
 import services.ClientListenersDataBus;
@@ -37,11 +38,17 @@ public class TrackedEquipmentService {
     }
 
     public void addToBlackList(Long id) {
+        if (!isExist(id)) {
+            throw new ResourceNotFoundException("Оборудование с id" + id + " не найдено.");
+        }
         blackListOperation(id, BlackListStatus.DISABLE.getStatus());
         disconnect(id);
     }
 
     public void removeFromBlackList(Long id) {
+        if (!isExist(id)) {
+            throw new ResourceNotFoundException("Устройства с id" + id + " не найдено.");
+        }
         blackListOperation(id, BlackListStatus.ENABLE.getStatus());
     }
 
@@ -73,14 +80,14 @@ public class TrackedEquipmentService {
         NodeListener.removeNodeFromTrackingById(id);
     }
 
-    public void createNewTrackedEquipment(TrackedEquipmentDto trackedEquipmentDto) {
+    public TrackedEquipment createNewTrackedEquipment(TrackedEquipmentDto trackedEquipmentDto) {
         TrackedEquipment trackedEquipment = new TrackedEquipment();
         trackedEquipment.setEquipmentUuid(trackedEquipmentDto.getUuid());
         trackedEquipment.setEquipmentTitle(trackedEquipmentDto.getTitle());
         trackedEquipment.setEquipmentIpAddress(trackedEquipmentDto.getIp());
         trackedEquipment.setEquipmentOnlineStatus(trackedEquipmentDto.getOnlineStatus());
         trackedEquipment.setEquipmentMacAddress(trackedEquipmentDto.getMac());
-        trackedEquipmentRepository.save(trackedEquipment);
+        return trackedEquipmentRepository.save(trackedEquipment);
     }
 
     public void blackListOperation(Long id, int blackListStatus) {
