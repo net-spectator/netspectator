@@ -1,10 +1,13 @@
 package org.net.webcoreservice.service;
 
-import org.net.webcoreservice.entities.Sensors;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.dto.TrackedEqSensorsDto;
+import org.net.webcoreservice.entities.Sensors;
 import org.net.webcoreservice.entities.TrackedEquipment;
 import org.net.webcoreservice.entities.TrackedEquipmentSensors;
+import org.net.webcoreservice.exeptions.ExistsException;
+import org.net.webcoreservice.exeptions.ResourceNotFoundException;
+import org.net.webcoreservice.exeptions.ValidateException;
 import org.net.webcoreservice.repository.SensorsRepository;
 import org.net.webcoreservice.repository.TrackedEqSensorsRepository;
 import org.net.webcoreservice.repository.TrackedEquipmentRepository;
@@ -42,6 +45,15 @@ public class TrackedEqSensorsService {
     }
 
     public void addSensorInEquipment(TrackedEqSensorsDto dto) {
+        if (dto.getSensorId() < 0 || dto.getEquipmentId() < 0) {
+            throw new ValidateException("id сенсора или оборудования не могут быть отрицательными");
+        }
+        if (!sensorOrVapExists(dto.getSensorId(), dto.getEquipmentId())) {
+            throw new ResourceNotFoundException("Такого сенсора или оборудования не существует");
+        }
+        if (isExists(dto.getSensorId(), dto.getEquipmentId())) {
+            throw new ExistsException("Связь уже существует");
+        }
         TrackedEquipmentSensors equipmentSensors = new TrackedEquipmentSensors();
         equipmentSensors.setSensors(sensorsRepository.getById(dto.getSensorId()));
         equipmentSensors.setTrackedEquipment(trackedEquipmentRepository.getById(dto.getEquipmentId()));

@@ -30,3 +30,5 @@ spring:
     sender:
       email: netspectator0000@gmail.com
       text: no-reply
+
+base-url: ${BASE_URL}

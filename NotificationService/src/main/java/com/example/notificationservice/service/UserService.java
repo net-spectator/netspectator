@@ -6,6 +6,7 @@ import com.example.notificationservice.Repository.GroupsRepository;
 import com.example.notificationservice.entity.Groups;
 import com.example.notificationservice.entity.NotificationType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,12 @@ public class UserService {
     private final GroupsRepository groupsRepository;
     private final GroupConverter converter;
 
+    @Value("${base-url}")
+    private String baseUrl;
+
 
     public List<UUID> getUuidFromUsers() {
-        String url = "http://localhost:9090/api/v1/users";
+        String url = baseUrl + "/api/v1/users";
         ResponseEntity<List<UserDTO>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
@@ -53,7 +57,7 @@ public class UserService {
         List<GroupDto> groupDtos = getUsersUuidFromDb(errorType);
         List<String> emailList = new ArrayList<>();
         for (int i = 0; i < groupDtos.size(); i++) {
-            String url = "http://localhost:9090/api/v1/users/" + groupDtos.get(i).toString();
+            String url = baseUrl + "/api/v1/users/" + groupDtos.get(i).toString();
             ResponseEntity<UserDTO> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,

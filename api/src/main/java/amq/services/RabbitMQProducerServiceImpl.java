@@ -22,12 +22,8 @@ public class RabbitMQProducerServiceImpl implements RabbitMQProducerService {
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         this.rabbitTemplate = rabbitTemplate;
     }
-
+    @Override
     public void sendMessage(Object message, String routingKey) {
-        rabbitTemplate.convertAndSend(exchange, routingKey, message);
-    }
-
-    public void sendNotification(NotificationMessage message, String routingKey) {
         rabbitTemplate.convertAndSend(exchange, routingKey, message);
     }
 }
