@@ -19,8 +19,6 @@
         <module>NotificationService</module>
         <module>LoggerService</module>
         <module>Requests</module>
-        <module>TestJavaLog</module>
-        <module>TestSpringLog</module>
     </modules>
 
     <properties>
