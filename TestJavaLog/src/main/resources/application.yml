@@ -1,0 +1,8 @@
+spring:
+  rabbitmq:
+    host: localhost
+    username: nsmqreader
+    password: 2311
+    virtual-host: ns
+    template:
+      exchange: netspectator-exchange

@@ -30,7 +30,7 @@ public class KeycloakService {
   private Map<String, Object> attributes;
 
   public List<UserRepresentation> getUsers() {
-    return keycloak.realm(realm).users().list();
+    return keycloak.realm(realm).users().searchByAttributes("type:ns_user");
   }
 
   public List<Role> getMappedRoles(String id) {
