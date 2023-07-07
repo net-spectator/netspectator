@@ -31,10 +31,6 @@ public class UserActualizeService {
         return userRepository.findByUuid(uuid);
     }
 
-    public List<UserDTO> getUsers() {
-        return userRepository.findAll().stream().map(u -> userConverter.toDTO(u)).collect(Collectors.toList());
-    }
-
     public void checkUser(BearerTokenAuthentication auth) {
         UserDetails userDetails = detailsConverter.authToUserDetails(auth);
         Collection<Role> roles = auth.getAuthorities().stream().map(
