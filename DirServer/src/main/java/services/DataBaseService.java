@@ -20,10 +20,10 @@ public class DataBaseService {
 
 
     private static final SessionFactory factory;
-    private static Session session = null;
+
 
     static {
-        factory = new Configuration() // TODO: 23.06.2023 обеспечить доступ к этому классу из других классов
+        factory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .buildSessionFactory();
     }
@@ -36,7 +36,7 @@ public class DataBaseService {
 
     //добавляет новое устройство в базу данных
     public static synchronized int addTrackedEquipment(TrackedEquipment device) {
-        session = factory.getCurrentSession();
+        Session session = factory.getCurrentSession();
         try {
             session.beginTransaction();
             session.save(device);
@@ -48,7 +48,7 @@ public class DataBaseService {
     }
 
     public static synchronized EquipmentType getEquipmentTypeElement(String equipmentType) {
-        session = factory.getCurrentSession();
+        Session session = factory.getCurrentSession();
         session.beginTransaction();
         List<TrackedEquipment> te = null;
         EquipmentType et = null;
@@ -63,7 +63,7 @@ public class DataBaseService {
     }
 
     public static synchronized TrackedEquipment getTrackedEquipmentByUUID(String uuid) {
-        session = factory.getCurrentSession();
+        Session session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment device = null;
         try {
@@ -77,7 +77,7 @@ public class DataBaseService {
     }
 
     public static synchronized void changeDeviceStatus(String uuid, boolean status) {
-        session = factory.getCurrentSession();
+        Session session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment device = null;
         try {
@@ -91,8 +91,8 @@ public class DataBaseService {
     }
 
     public static synchronized void updateTrackedEquipment(TrackedEquipment device) {
+        Session session = factory.getCurrentSession();
         try {
-            session = factory.getCurrentSession();
             session.beginTransaction();
             session.update(device);
             session.getTransaction().commit();
@@ -103,8 +103,8 @@ public class DataBaseService {
 
     //удаляет выбранное устройство из базы данных
     public static synchronized int removeTrackedEquipment(TrackedEquipment device) {
+        Session session = factory.getCurrentSession();
         try {
-            session = factory.getCurrentSession();
             session.beginTransaction();
             session.delete(device);
             session.getTransaction().commit();
@@ -115,7 +115,7 @@ public class DataBaseService {
     }
 
     public static synchronized TrackedEquipment getTrackedNodeByIP(String ipAddress) {
-        session = factory.getCurrentSession();
+        Session session = factory.getCurrentSession();
         session.beginTransaction();
         TrackedEquipment te = null;
         try {

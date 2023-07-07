@@ -1,6 +1,7 @@
 package stringHandlers;
 
 import entities.Connection;
+import enums.Help;
 import io.netty.channel.ChannelHandlerContext;
 import services.ClientListenersDataBus;
 import utils.MessageSender;
@@ -43,7 +44,7 @@ public class ConnectionsList {
                 messageSender.sendMessageWithHeader(response.length() < 1 ? "empty" : response.toString());
                 return true;
 
-            case "close":
+            case "reboot":
                 int index = 0;
                 try {
                     index = Integer.parseInt(args[2]);
@@ -57,11 +58,12 @@ public class ConnectionsList {
                 }
                 messageSender.sendMessageWithHeader("Operation complete");
                 return true;
-            case "disabledList":
-                return blackList.disabledClientsListOperator(Arrays.copyOfRange(args, 1, args.length));
             case "this":
                 messageSender.sendMessageWithHeader(ctx.channel().remoteAddress().toString());
                 return true;
+            case "?":
+                messageSender.sendMessageWithHeader(Help.getConnectionsHelp());
+                break;
             default:
                 messageSender.sendMessageWithHeader("Bad command");
                 break;
