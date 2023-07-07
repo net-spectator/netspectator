@@ -26,7 +26,7 @@ public class EmailSenderConsumer {
     private String senderEmail;
 
     @RabbitListener(queues = "notifications")
-    public void sendEmail(@Payload NotificationMessage message) {
+    public void sendEmail(@Payload NotificationMessage message) throws InterruptedException {
         List<String> emails = userService.getUsersEmail(message.getMessageType());
         for (int i = 0; i < emails.size(); i++) {
             SimpleMailMessage notification = new SimpleMailMessage();

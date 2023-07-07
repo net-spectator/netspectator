@@ -44,20 +44,20 @@ public class UserService {
         return uuids;
     }
 
-    public void insertUserIntoDb(UUID uuid, Long errorType) {
+    public void insertUserIntoDb(UUID uuid, Long typeId) {
         NotificationType type = new NotificationType();
-        type.setId(errorType);
+        type.setId(typeId);
         Groups groups = new Groups();
         groups.setUserUuid(uuid);
         groups.setTypeId(type);
         groupsRepository.save(groups);
     }
 
-    public List<String> getUsersEmail(Long errorType) {
-        List<GroupDto> groupDtos = getUsersUuidFromDb(errorType);
+    public List<String> getUsersEmail(Long typeId) {
+        List<GroupDto> groupDtos = getUsersUuidFromDb(typeId);
         List<String> emailList = new ArrayList<>();
         for (int i = 0; i < groupDtos.size(); i++) {
-            String url = baseUrl + "/api/v1/users/" + groupDtos.get(i).toString();
+            String url = baseUrl + "/api/v1/users/" + groupDtos.get(i).getUuid().toString();
             ResponseEntity<UserDTO> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
@@ -69,9 +69,9 @@ public class UserService {
         return emailList;
     }
 
-    public List<GroupDto> getUsersUuidFromDb(Long errorTypeId) {
+    public List<GroupDto> getUsersUuidFromDb(Long typeId) {
         NotificationType type = new NotificationType();
-        type.setId(errorTypeId);
+        type.setId(typeId);
         return groupsRepository.findAllByTypeId(type).stream().map(converter::entityToDto).collect(Collectors.toList());
     }
 }
