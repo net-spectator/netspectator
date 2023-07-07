@@ -31,7 +31,7 @@ public class Material {
     @Column(name = "state")
     private StateEquipment state;
 
-    @Column(name = "responsible")
+    @Column(name = "responsible_id")
     private UUID responsible;
 
     @ManyToOne

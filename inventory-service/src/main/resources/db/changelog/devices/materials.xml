@@ -31,7 +31,7 @@
             
             <column name="state" type="tinyint"/>
             
-            <column name="responsible" type="uuid"/>
+            <column name="responsible_id" type="uuid"/>
 
             <column name="type_id" type="uuid"/>
 

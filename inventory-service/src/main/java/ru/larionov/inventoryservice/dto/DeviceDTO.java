@@ -21,7 +21,7 @@ public class DeviceDTO {
     private StateEquipment state;
     private UUID responsible;
     private UUID user;
-    private TypeMaterial typeMaterial;
-    private Vendor vendor;
+    private TypeMaterialDTO typeMaterial;
+    private VendorDTO vendor;
     private RegistrationNumber registrationNumber;
 }

@@ -28,10 +28,10 @@ public class Device {
     @Column(name = "state")
     private StateEquipment state;
 
-    @Column(name = "responsible")
+    @Column(name = "responsible_id")
     private UUID responsible;
 
-    @Column(name = "user")
+    @Column(name = "user_id")
     private UUID user;
 
     @ManyToOne

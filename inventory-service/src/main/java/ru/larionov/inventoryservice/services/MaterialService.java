@@ -1,6 +1,8 @@
 package ru.larionov.inventoryservice.services;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import ru.larionov.inventoryservice.entity.Material;
 import ru.larionov.inventoryservice.entity.Place;
 import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.repository.MaterialRepository;
+import ru.larionov.inventoryservice.repository.MaterialWithDetailsRepository;
 import ru.larionov.inventoryservice.repository.PlaceRepository;
 import ru.larionov.inventoryservice.repository.RegistrationNumberRepository;
 
@@ -24,6 +27,7 @@ public class MaterialService {
 
     private final MaterialRepository materialRepository;
     private final RegistrationNumberRepository registrationNumberRepository;
+    private final MaterialWithDetailsRepository materialWithDetailsRepository;
 
     public List<MaterialDTO> getAllMaterials() {
         return materialRepository
