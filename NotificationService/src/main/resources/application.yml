@@ -3,11 +3,18 @@ server:
   servlet:
     context-path: /notification
 spring:
+  rabbitmq:
+    host: localhost
+    username: nsmqreader
+    password: 2311
+    virtual-host: ns
+    template:
+      exchange: netspectator-exchange
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/notifications
-    username: postgres
-    password: root
+    url: jdbc:postgresql://localhost:5435/notifications
+    username: w0id
+    password: 2311
   jpa:
     show-sql: true
     properties:
@@ -29,6 +36,5 @@ spring:
             enable: true
     sender:
       email: netspectator0000@gmail.com
-      text: no-reply
 
 base-url: ${BASE_URL}

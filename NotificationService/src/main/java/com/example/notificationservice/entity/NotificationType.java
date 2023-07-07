@@ -1,8 +1,7 @@
 package com.example.notificationservice.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
-
-import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -15,8 +14,8 @@ public class NotificationType {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "error_type")
-    private String errorType;
+    @Column(name = "type_title")
+    private String typeTitle;
 
     @OneToMany(mappedBy = "typeId")
     private List<Groups> groupsList;

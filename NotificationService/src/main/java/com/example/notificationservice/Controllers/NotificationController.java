@@ -20,7 +20,7 @@ public class NotificationController {
     }
 
     @PostMapping
-    public void writeUuidToDb(@RequestParam UUID uuid, Long errorType) {
-        userService.insertUserIntoDb(uuid, errorType);
+    public void writeUuidToDb(@RequestParam UUID uuid, Long typeId) {
+        userService.insertUserIntoDb(uuid, typeId);
     }
 }
