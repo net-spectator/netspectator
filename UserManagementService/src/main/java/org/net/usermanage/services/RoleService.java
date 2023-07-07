@@ -1,9 +1,9 @@
 package org.net.usermanage.services;
 
 import lombok.RequiredArgsConstructor;
-import org.net.usermanage.repositories.RoleRepository;
+import org.net.users.entities.Role;
+import org.net.users.repositories.RoleRepository;
 import org.springframework.stereotype.Service;
-import org.net.usermanage.entities.Role;
 
 @Service
 @RequiredArgsConstructor

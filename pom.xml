@@ -19,6 +19,7 @@
         <module>NotificationService</module>
         <module>LoggerService</module>
         <module>Requests</module>
+        <module>UserService</module>
     </modules>
 
     <properties>

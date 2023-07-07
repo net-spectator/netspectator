@@ -2,16 +2,15 @@ package org.net.usermanage.converters;
 
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
+import org.net.users.entities.UserDetails;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Component;
-import org.net.usermanage.entities.UserDetails;
-import users.dtos.UserDetailsDTO;
 
 import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class UserDetailsConverter {
+public class DetailsConverter {
 
     private JSONObject userAttributes;
     private String email;
@@ -29,15 +28,6 @@ public class UserDetailsConverter {
                 auth.getTokenAttributes().get("family_name").toString(),
                 email,
                 userAttributes
-        );
-    }
-
-    public UserDetailsDTO toDTO(UserDetails userDetails) {
-        return new UserDetailsDTO(
-                userDetails.getGivenName(),
-                userDetails.getFamilyName(),
-                userDetails.getEmail(),
-                userDetails.getAttributes()
         );
     }
 }
