@@ -9,7 +9,6 @@ public class SensorsConverter {
 
     public SensorDto entityToDto(Sensors sensors) {
         SensorDto dto = new SensorDto();
-        dto.setId(sensors.getId());
         dto.setTitle(sensors.getSensorTitle());
         return dto;
     }

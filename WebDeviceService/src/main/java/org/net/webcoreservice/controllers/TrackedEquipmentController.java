@@ -81,9 +81,8 @@ public class TrackedEquipmentController {
 
     @PutMapping("/removeBlackList/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> removeClientToBlackList(@PathVariable Long id) {
+    public void removeClientToBlackList(@PathVariable Long id) {
         trackedEquipmentService.removeFromBlackList(id);
-        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 
 
@@ -91,13 +90,6 @@ public class TrackedEquipmentController {
     public TrackedEquipmentDto getEquipmentById(@PathVariable Long id) {
         return converter.entityToDto(trackedEquipmentService.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Оборудование с id:" + id + " не найдено")));
-    }
-
-    @PostMapping
-    public ResponseEntity<TrackedEquipmentDto> createNewEquipment(@RequestBody TrackedEquipmentDto trackedEquipmentDto) {
-        TrackedEquipment trackedEquipment = trackedEquipmentService.createNewTrackedEquipment(trackedEquipmentDto);
-        TrackedEquipmentDto createdTrackedEqDto = converter.entityToDto(trackedEquipment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTrackedEqDto);
     }
 
     @DeleteMapping("/{id}")

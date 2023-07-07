@@ -36,12 +36,12 @@ public class TrackedEqSensorsService {
     }
 
     @Transactional
-    public Optional<TrackedEquipmentSensors> deleteSensorFromEquipment(Long sensorId, Long equipmentId) {
+    public void deleteSensorFromEquipment(Long sensorId, Long equipmentId) {
         TrackedEquipment tr = new TrackedEquipment();
         tr.setId(equipmentId);
         Sensors s = new Sensors();
         s.setId(sensorId);
-        return trackedEqSensorsRepository.deleteBySensorsAndTrackedEquipment(s, tr);
+        trackedEqSensorsRepository.deleteBySensorsAndTrackedEquipment(s, tr);
     }
 
     public void addSensorInEquipment(TrackedEqSensorsDto dto) {

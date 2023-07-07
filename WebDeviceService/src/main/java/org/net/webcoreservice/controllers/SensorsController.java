@@ -33,9 +33,8 @@ public class SensorsController {
     }
 
     @PostMapping
-    @ResponseBody
-    public ResponseEntity<SensorDto> createNewSensor(@RequestBody SensorDto sensorDto) {
-        Sensors sensor = sensorsService.createNewSensor(sensorDto);
+    public ResponseEntity<SensorDto> createNewSensor(@RequestParam String title) {
+        Sensors sensor = sensorsService.createNewSensor(title);
         SensorDto createdSensorDto = sensorsConverter.entityToDto(sensor);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSensorDto);
     }

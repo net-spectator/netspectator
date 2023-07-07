@@ -27,7 +27,7 @@ public class TrackedEqSensorsController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSensorFromEquipment(@RequestParam Long sensorId, @RequestParam Long equipId) {
+    public void deleteSensorFromEquipment(@RequestParam Long sensorId, Long equipId) {
         trackedEqSensorsService.deleteSensorFromEquipment(sensorId, equipId);
     }
 
