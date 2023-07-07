@@ -1,8 +1,8 @@
-package org.net.usermanage.controllers;
+package org.net.users.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.net.usermanage.services.UserActualizeService;
 import org.net.users.converters.UserConverter;
+import org.net.users.services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,15 +19,15 @@ public class UserController {
 
     private final UserConverter userConverter;
 
-    private final UserActualizeService userActualizeService;
+    private final UserService userService;
 
     @GetMapping
     public List<UserDTO> getUsers() {
-        return userActualizeService.getUsers();
+        return userService.getUsers();
     }
 
     @GetMapping("{uuid}")
     public UserDTO getUser(@PathVariable UUID uuid) {
-        return userConverter.toDTO(userActualizeService.getUser(uuid).get());
+        return userConverter.toDTO(userService.getUser(uuid).get());
     }
 }

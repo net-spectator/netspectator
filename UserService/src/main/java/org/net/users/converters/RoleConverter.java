@@ -1,6 +1,6 @@
-package org.net.usermanage.converters;
+package org.net.users.converters;
 
-import org.net.usermanage.entities.Role;
+import org.net.users.entities.Role;
 import org.springframework.stereotype.Component;
 import users.dtos.RoleDTO;
 

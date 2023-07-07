@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.net.users.entities.Role;
+import org.net.users.entities.User;
+import org.net.users.entities.UserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.net.usermanage.entities.Role;
-import org.net.usermanage.entities.User;
-import org.net.usermanage.entities.UserDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;
