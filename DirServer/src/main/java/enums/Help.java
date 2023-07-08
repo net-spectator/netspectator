@@ -1,41 +1,43 @@
 package enums;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 //Не Enum, но очень похож по содержимому
 public class Help {
-    private static final HashMap<String, String> connections;
-    private static final HashMap<String, String> disconnected;
-    private static final HashMap<String, String> nodes;
-    private static final HashMap<String, String> root;
+    private static final LinkedHashMap<String, String> connections;
+    private static final LinkedHashMap<String, String> disconnected;
+    private static final LinkedHashMap<String, String> nodes;
+    private static final LinkedHashMap<String, String> root;
     private static StringBuilder sb = null;
 
     static {
         //корневой help
-        root = new HashMap<>();
+        root = new LinkedHashMap<>();
+        root.put("auth [login] [pass]", "Авторизация на сервере.");
         root.put("connections [args]", "Управление подключенными клиентами");
         root.put("disconnected [args]", "Управление отключенными клиентами");
         root.put("nodes [args]", "Управление узлами");
         root.put("shutdown [args]", "Завершение работы сервера");
-        root.put("auth [login] [pass]", "Авторизация на сервере.");
 
         //управление подключениями
-        connections = new HashMap<>();
+        connections = new LinkedHashMap<>();
         connections.put("show", "Отображает список подключенных клиентов");
         connections.put("reboot [index]", "Перезагрузить клиент по индексу [index]. Для отображения списка используйте команду [show]");
         connections.put("this", "Показать параметры текущего подключения");
 
         //управление отключенными клиентами
-        disconnected = new HashMap<>();
+        disconnected = new LinkedHashMap<>();
         disconnected.put("show", "Отображает список отключенных клиентов");
-        disconnected.put("remove [index]", "Удаляет клиент из списка отключенных по индексу [index]. Для отображения списка используйте команду [show]");
         disconnected.put("add [index]", "Добавляет клиент в список отключенных по индексу [index]. Для отображения списка используйте команду [show]");
+        disconnected.put("remove [index]", "Удаляет клиент из списка отключенных по индексу [index]. Для отображения списка используйте команду [show]");
 
         //управление наблюдаемыми узлами
-        nodes = new HashMap<>();
-        nodes.put("detected", "Отображает список обнаруженных узлов. Для обнаружения узлов используйте [scan IP]");
+        nodes = new LinkedHashMap<>();
         nodes.put("scan ip_address", "Выполнить сканирование сети [ip_address]. Пример: scan 192.168.0.0");
+        nodes.put("detected", "Отображает список обнаруженных узлов. Для обнаружения узлов используйте [scan IP]");
         nodes.put("add [index]", "Добавляет узел на отслеживание по индексу [index]. Для отображения списка используйте команду [detected]");
+        nodes.put("add [index] [-n] [name]", "Добавляет узел на отслеживание по индексу [index] с заданием имени [name]. Для отображения списка используйте команду [detected]");
         nodes.put("tracked", "Отобразить наблюдаемые узлы");
         nodes.put("remove [index]", "Удаляет наблюдаемый узел из списка по индексу [index]. Для отображения списка используйте команду [tracked]");
         nodes.put("tracking [start/stop]", "Включает/отключает режим наблюдения за узлами");
