@@ -1,13 +1,24 @@
 package services;
 
 import entities.Requests;
-import entities.RequestsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import repositories.RequestsRepository;
 import repositories.RequestsStatusRepository;
+import javax.transaction.Transactional;
+
+import repositories.specifications.RequestsSpecifications;
+import ru.larionov.inventoryservice.dto.DeviceDTO;
+import users.dtos.UserDTO;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static ch.qos.logback.core.joran.JoranConstants.NULL;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +34,40 @@ public class RequestsService {
         requestsRepository.deleteById(id);
     }
 
-    public Requests createNewRequests (RequestsDto requestsDto){
-        Requests requests = Requests.newBuilder()
-                .topic(requestsDto.getTopic())
-                .description(requestsDto.getDescription())
-                .executor_comments(requestsDto.getExecutorComments())
-                .request_status(requestsDto.getRequestsStatus())
-                .request_user_id(requestsDto.getRequestUserId())
-                .request_user_id(requestsDto.getRequestUserId())
-                .equipment_id(requestsDto.getEquipmentId())
-                .build();
-        requestsRepository.save(requests);
-        return requests;
+    @Transactional
+    public void createNewRequests (String user, String equipment,String topic,String description){
+        Requests req = new Requests();
+        req.setUserId(UUID.fromString(user));
+
+        req.setReqStatusId(UUID.fromString("Создано"));
+        req.setTopic(topic);
+        req.setDescription(description);
+        req.setExecutorUserId(UUID.fromString(NULL));
+        req.setExecutorComments(NULL);
+
+        requestsRepository.save(req);
     }
 
-    public Page<Requests> findAll() {
-        return (Page<Requests>) requestsStatusRepository.findAll();
+    public Page<Requests> findAll(Specification<Requests> spec, int page) {
+        int sizePage = 10;
+        return requestsRepository.findAll(spec, PageRequest.of(page,sizePage));
+    }
+
+    public List<Requests> findUserRequests(String username) {
+        return requestsRepository.findAllByUsername(username);
+    }
+
+    public Specification<Requests> createSpecByFilters(UserDTO user, DeviceDTO equipment, String topic){
+        Specification<Requests> spec = Specification.where(null);
+        if (user != null){
+            spec = spec.and(RequestsSpecifications.usersThan(user));
+        }
+        if (equipment != null){
+            spec = spec.and(RequestsSpecifications.equipmentThan(equipment));
+        }
+        if (topic != null){
+            spec = spec.and(RequestsSpecifications.topicLike(topic));
+        }
+        return spec;
     }
 }
