@@ -28,6 +28,7 @@ public class ChanelListener {
     private final Connection connection;
     private final ServerControl server;
     private final NodesControl nodesControl;
+    private ClientHardwareAnalyzer hardwareAnalyzer;
     private static final Logger LOGGER = Logger.getLogger(ChanelListener.class);
 
     public void listen(ChannelHandlerContext ctx, Object msg) throws IOException {
@@ -139,6 +140,7 @@ public class ChanelListener {
                 ObjectMapper mapper = new ObjectMapper();
                 ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
                 connection.getDevice().setDeviceInfo(deviceInfo);
+                hardwareAnalyzer.check(deviceInfo);
                 break;
             default:
                 messageSender.sendMessageWithHeader("Unknown command");
@@ -160,5 +162,6 @@ public class ChanelListener {
                 .replace("/", ""));
         DataBaseService.updateTrackedEquipment(device);
         connection.setDevice(device);
+        hardwareAnalyzer = new ClientHardwareAnalyzer(connection.getDevice());
     }
 }
