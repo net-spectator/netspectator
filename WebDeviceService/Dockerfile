@@ -7,9 +7,7 @@ RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true spring-boot:repacka
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 RUN mkdir resources
-COPY --from=builder /app/target/*.jar /app/*.jar
-#COPY WebDeviceService/target/*.jar /app/*.jar
+COPY --from=builder /app/target/*.jar /app/WebDeviceService.jar
 COPY WebDeviceService/src/main/resources/server.properties /app/resources
-#COPY WebDeviceService/target/*.jar /app/*.jar
 EXPOSE 8181
-ENTRYPOINT ["java", "-jar", "/app/*.jar"]
+ENTRYPOINT ["java", "-jar", "/app/WebDeviceService.jar"]
