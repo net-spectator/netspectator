@@ -11,7 +11,6 @@ public class NSLogger extends Category {
 
     private final Logger localLogger;
     private RabbitLogger serverLogger;
-    private boolean serverLog; // TODO: 29.06.2023 после добавления логера это поле не нужно, его заменит loggerFactory
     private final List<Category> loggerFactory;
     private final Class<?> clazz;
     private final String moduleName;
@@ -28,12 +27,11 @@ public class NSLogger extends Category {
         }
     }
 
-    public boolean isServerLog() { // TODO: 29.06.2023 добавить серверный логер
-        return serverLog;
+    public boolean isServerLog() {
+        return loggerFactory.contains(serverLogger);
     }
 
-    public void setServerLog(boolean serverLog) { // TODO: 29.06.2023 аналогично локальному
-        this.serverLog = serverLog;
+    public void setServerLog(boolean serverLog) {
         if (serverLog) {
             loggerFactory.add(serverLogger);
         } else {
