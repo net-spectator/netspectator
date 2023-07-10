@@ -37,4 +37,12 @@ public class MaterialSpecifications {
     public static Specification<MaterialWithDetailsDTO> vendorLike(String namePart) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("vendorName"), namePart + "%");
     }
+
+    public static Specification<MaterialWithDetailsDTO> userEqual(UUID userId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("userId"), userId);
+    }
+
+    public static Specification<MaterialWithDetailsDTO> responsibleEqual(UUID responsibleId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("responsibleId"), responsibleId);
+    }
 }

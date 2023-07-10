@@ -1,5 +1,9 @@
 package ru.larionov.inventoryservice.services;
 
+import amq.entities.Message;
+import amq.entities.NotificationMessage;
+import amq.services.RabbitMQProducerService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -13,16 +17,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.larionov.inventoryservice.converters.DeviceConverter;
 import ru.larionov.inventoryservice.dto.DeviceDTO;
-import ru.larionov.inventoryservice.entity.Device;
-import ru.larionov.inventoryservice.entity.RegistrationNumber;
-import ru.larionov.inventoryservice.entity.TypeMaterial;
-import ru.larionov.inventoryservice.entity.Vendor;
+import ru.larionov.inventoryservice.entity.*;
 import ru.larionov.inventoryservice.exeptions.BadParametersOfRequest;
 import ru.larionov.inventoryservice.exeptions.TypeMaterialNotFound;
 import ru.larionov.inventoryservice.exeptions.VendorNotFound;
 import ru.larionov.inventoryservice.repository.*;
 import ru.larionov.inventoryservice.specifications.DeviceSpecifications;
 import ru.larionov.inventoryservice.views.DeviceWithDetailsDTO;
+import utils.NSLogger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,10 +37,17 @@ public class DeviceService {
     private final DeviceWithDetailsRepository deviceWithDetailsRepository;
     private final RegistrationNumberRepository registrationNumberRepository;
     private final TypeMaterialRepository typeMaterialRepository;
-
+    private final UserService userService;
     private final VendorRepository vendorRepository;
+    private final NotificationService notificationService;
 
-    private final SessionFactory sessionFactory;
+    private final NSLogger LOGGER = new NSLogger(Device.class);
+
+    @PostConstruct
+    private void init() {
+        LOGGER.setLocalLog(true);
+        LOGGER.setServerLog(true);
+    }
 
     public List<DeviceDTO> getAllDevices(UUID userID,
                                          Integer page,
@@ -52,6 +61,14 @@ public class DeviceService {
         size = size > 50 ? 50 : size;
 
         Specification<DeviceWithDetailsDTO> spec = Specification.where(null);
+
+        if (!userService.isAdmin(userID)){
+            spec = spec.and(
+                    DeviceSpecifications
+                            .userEqual(userID)
+                            .or(
+                                    DeviceSpecifications.responsibleEqual(userID)));
+        }
 
         if (place != null){
             if (hierarchy){
@@ -97,15 +114,20 @@ public class DeviceService {
 
         Device device = DeviceConverter.fromDTO(deviceDTO);
 
+        boolean isNew = device.getId() == null;
+
         Vendor vendor = device.getVendor();
         if (vendor != null){
             if (vendor.getId() != null) {
                 Optional<Vendor> vendorById = vendorRepository.findById(vendor.getId());
-                if (vendorById.isEmpty())
+                if (vendorById.isEmpty()){
+                    LOGGER.error("Vendor not found " + vendor.getId().toString());
                     throw new VendorNotFound(vendor.getId().toString());
+                }
                 else
                     device.setVendor(vendorById.get());
             } else {
+                LOGGER.error("passed non-existent attribute in base \"Vendor\"");
                 throw new BadParametersOfRequest("passed non-existent attribute in base \"Vendor\"");
             }
         }
@@ -114,11 +136,14 @@ public class DeviceService {
         if (typeMaterial != null) {
             if (typeMaterial.getId() != null) {
                 Optional<TypeMaterial> typeMaterialById = typeMaterialRepository.findById(typeMaterial.getId());
-                if (typeMaterialById.isEmpty())
+                if (typeMaterialById.isEmpty()) {
+                    LOGGER.error("Type material not found " + vendor.getId().toString());
                     throw new TypeMaterialNotFound(typeMaterial.getId().toString());
+                }
                 else
                     device.setTypeMaterial(typeMaterialById.get());
             } else {
+                LOGGER.error("passed non-existent attribute in base \"TypeMaterial\"");
                 throw new BadParametersOfRequest("passed non-existent attribute in base \"TypeMaterial\"");
             }
         }
@@ -127,8 +152,20 @@ public class DeviceService {
         if (device.getId() == null){
             RegistrationNumber registrationNumber = new RegistrationNumber();
             device.setRegistrationNumber(registrationNumberRepository.save(registrationNumber));
+        } else {
+            Device dbDevice = deviceRepository.findById(device.getId()).get();
+            if (!dbDevice.getUser().equals(device.getUser())) {
+                LOGGER.info(String.format("изменен пользователь у устройства %s [%s]",
+                        device.getName(), device.getId()));
+                notificationService.sendNotification(6L,
+                        String.format("Сменился пользователь у устройства %s [%s]",
+                                device.getName(),
+                                device.getId()));
+            }
         }
 
+        LOGGER.info(String.format("Сохранено/изменено устройство %s [%s]",
+                device.getName(), device.getId()));
         return DeviceConverter.toDTO(deviceRepository.save(device));
     }
 }

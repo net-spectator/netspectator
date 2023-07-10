@@ -35,6 +35,7 @@ public class MaterialService {
     private final MaterialRepository materialRepository;
     private final RegistrationNumberRepository registrationNumberRepository;
     private final MaterialWithDetailsRepository materialWithDetailsRepository;
+    private final UserService userService;
 
     public List<MaterialDTO> getAllMaterials(UUID userID,
                                              Integer page,
@@ -49,6 +50,14 @@ public class MaterialService {
 
 
         Specification<MaterialWithDetailsDTO> spec = Specification.where(null);
+
+        if (!userService.isAdmin(userID)){
+            spec = spec.and(
+                    MaterialSpecifications
+                            .userEqual(userID)
+                            .or(
+                                    MaterialSpecifications.responsibleEqual(userID)));
+        }
 
         if (place != null){
             if (hierarchy){
