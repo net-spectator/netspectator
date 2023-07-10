@@ -8,6 +8,13 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>project.local</id>
+            <name>netspactator</name>
+            <url>file:${project.basedir}/repo</url>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -29,6 +36,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -55,6 +66,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.net.users.UserApplication</mainClass>
+                    <layout>JAR</layout>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
@@ -77,5 +103,9 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <start-class>org.net.users.UserApplication</start-class>
+    </properties>
 
 </project>

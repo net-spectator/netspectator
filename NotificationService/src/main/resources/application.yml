@@ -1,10 +1,10 @@
 server:
-  port: 8190
+  port: ${SERVER_PORT:8190}
   servlet:
     context-path: /notification
 spring:
   rabbitmq:
-    host: localhost
+    host: ${MQ_HOST:rabbitmq}
     username: nsmqreader
     password: 2311
     virtual-host: ns
@@ -12,9 +12,9 @@ spring:
       exchange: netspectator-exchange
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5435/notifications
-    username: w0id
-    password: 2311
+    url: jdbc:postgresql://${DB_HOST:keycloak-postgres:5432}/${DB_NAME:notifications}
+    username: ${DB_USER:w0id}
+    password: ${DB_PASSWORD:2311}
   jpa:
     show-sql: true
     properties:

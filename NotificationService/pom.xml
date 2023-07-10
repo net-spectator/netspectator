@@ -13,8 +13,18 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>NotificationService</name>
 	<description>NotificationService</description>
+
+	<repositories>
+		<repository>
+			<id>project.local</id>
+			<name>netspactator</name>
+			<url>file:${project.basedir}/repo</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<java.version>11</java.version>
+		<start-class>com.example.notificationservice.NotificationServiceApplication</start-class>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -84,6 +94,21 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.example.notificationservice.NotificationServiceApplication</mainClass>
+					<layout>JAR</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
