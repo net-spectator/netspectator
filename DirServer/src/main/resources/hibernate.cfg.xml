@@ -5,7 +5,7 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://localhost:5435/deviceService</property>
+        <property name="connection.url">jdbc:postgresql://keycloak-postgres:5432/deviceService</property>
         <property name="connection.username">w0id</property>
         <property name="connection.password">2311</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>

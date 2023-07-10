@@ -15,7 +15,7 @@ public final class ClientListenersStarter {
     private static EventLoopGroup auth;
     private static EventLoopGroup worker;
     private static int PORT;
-    private static String PROPERTIES_PATH = "server.properties";
+    private static String PROPERTIES_PATH = "resources/server.properties";
     public static Properties properties;
     private static final NSLogger LOGGER = new NSLogger(ClientListenersStarter.class);
 
