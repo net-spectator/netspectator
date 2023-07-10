@@ -2,7 +2,7 @@ package ru.larionov.inventoryservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.larionov.inventoryservice.dto.DeviceDTO;
+import inventory.dtos.DeviceDTO;
 import ru.larionov.inventoryservice.services.DeviceService;
 
 import java.util.List;

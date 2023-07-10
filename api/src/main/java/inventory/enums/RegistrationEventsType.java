@@ -1,4 +1,4 @@
-package ru.larionov.inventoryservice.entity;
+package inventory.enums;
 
 public enum RegistrationEventsType {
     DEBET, CREDIT

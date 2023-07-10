@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.larionov.inventoryservice.converters.PlaceConverter;
-import ru.larionov.inventoryservice.dto.PlaceDTO;
+import inventory.dtos.PlaceDTO;
 import ru.larionov.inventoryservice.entity.Place;
 import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.repository.PlaceRepository;

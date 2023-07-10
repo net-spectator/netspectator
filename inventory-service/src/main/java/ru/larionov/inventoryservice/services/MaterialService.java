@@ -1,27 +1,19 @@
 package ru.larionov.inventoryservice.services;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.larionov.inventoryservice.converters.DeviceConverter;
 import ru.larionov.inventoryservice.converters.MaterialConverter;
-import ru.larionov.inventoryservice.dto.MaterialDTO;
+import inventory.dtos.MaterialDTO;
 import ru.larionov.inventoryservice.entity.Material;
-import ru.larionov.inventoryservice.entity.Place;
 import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.repository.MaterialRepository;
 import ru.larionov.inventoryservice.repository.MaterialWithDetailsRepository;
-import ru.larionov.inventoryservice.repository.PlaceRepository;
 import ru.larionov.inventoryservice.repository.RegistrationNumberRepository;
-import ru.larionov.inventoryservice.specifications.DeviceSpecifications;
 import ru.larionov.inventoryservice.specifications.MaterialSpecifications;
-import ru.larionov.inventoryservice.views.DeviceWithDetailsDTO;
 import ru.larionov.inventoryservice.views.MaterialWithDetailsDTO;
 
 import java.util.List;

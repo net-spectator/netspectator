@@ -1,6 +1,6 @@
 package ru.larionov.inventoryservice.converters;
 
-import ru.larionov.inventoryservice.dto.MaterialDTO;
+import inventory.dtos.MaterialDTO;
 import ru.larionov.inventoryservice.entity.Material;
 import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.views.MaterialWithDetailsDTO;
@@ -19,7 +19,7 @@ public class MaterialConverter {
         materialDTO.setResponsible(material.getResponsible());
         materialDTO.setTypeMaterial(TypeMaterialConverter.toDTO(material.getTypeMaterial()));
         materialDTO.setVendor(VendorConverter.toDTO(material.getVendor()));
-        materialDTO.setRegistrationNumber(material.getRegistrationNumber());
+        materialDTO.setRegistrationNumber(material.getRegistrationNumber().getId());
 
         return materialDTO;
     }
@@ -35,7 +35,7 @@ public class MaterialConverter {
         materialDTO.setResponsible(material.getResponsible());
         materialDTO.setTypeMaterial(TypeMaterialConverter.toDTO(material.getTypeMaterial()));
         materialDTO.setVendor(VendorConverter.toDTO(material.getVendor()));
-        materialDTO.setRegistrationNumber(new RegistrationNumber(material.getRegistrationNumber()));
+        materialDTO.setRegistrationNumber(material.getRegistrationNumber());
 
         return materialDTO;
     }
@@ -52,7 +52,7 @@ public class MaterialConverter {
         material.setResponsible(materialDTO.getResponsible());
         material.setTypeMaterial(TypeMaterialConverter.fromDTO(materialDTO.getTypeMaterial()));
         material.setVendor(VendorConverter.fromDTO(materialDTO.getVendor()));
-        material.setRegistrationNumber(materialDTO.getRegistrationNumber());
+        material.setRegistrationNumber(new RegistrationNumber(materialDTO.getRegistrationNumber()));
 
         return material;
     }

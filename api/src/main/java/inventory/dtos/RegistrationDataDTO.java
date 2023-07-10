@@ -1,10 +1,9 @@
-package ru.larionov.inventoryservice.dto;
+package inventory.dtos;
 
+import inventory.enums.RegistrationEventsType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.larionov.inventoryservice.entity.RegistrationEventsType;
-import ru.larionov.inventoryservice.entity.RegistrationNumber;
 
 import java.util.Date;
 import java.util.UUID;

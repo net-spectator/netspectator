@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.larionov.inventoryservice.dto.Response;
+import http.dtos.Response;
 import ru.larionov.inventoryservice.exeptions.BadParametersOfRequest;
 import ru.larionov.inventoryservice.exeptions.TypeMaterialNotFound;
 import ru.larionov.inventoryservice.exeptions.VendorNotFound;

@@ -1,6 +1,6 @@
 package ru.larionov.inventoryservice.converters;
 
-import ru.larionov.inventoryservice.dto.VendorDTO;
+import inventory.dtos.VendorDTO;
 import ru.larionov.inventoryservice.entity.Vendor;
 
 public class VendorConverter {

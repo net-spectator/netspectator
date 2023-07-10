@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Subselect;
 import org.springframework.data.annotation.Immutable;
-import ru.larionov.inventoryservice.entity.RegistrationNumber;
-import ru.larionov.inventoryservice.entity.StateEquipment;
+import inventory.enums.StateEquipment;
 import ru.larionov.inventoryservice.entity.TypeMaterial;
 import ru.larionov.inventoryservice.entity.Vendor;
 
