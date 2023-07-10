@@ -9,8 +9,8 @@ CREATE TABLE request (
                          request_status_id int8 NULL,
                          created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                          updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
---                          ,CONSTRAINT request_pkey PRIMARY KEY (id),
---                          CONSTRAINT request_equipment_id_fkey FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON UPDATE CASCADE,
+                         ,CONSTRAINT request_pkey PRIMARY KEY (id)
+--                          ,CONSTRAINT request_equipment_id_fkey FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON UPDATE CASCADE,
 --                          CONSTRAINT request_executor_user_id_fkey FOREIGN KEY (executor_user_id) REFERENCES users(id) ON UPDATE CASCADE,
 --                          CONSTRAINT request_request_status_id_fkey FOREIGN KEY (request_status_id) REFERENCES request_status(id) ON UPDATE CASCADE,
 --                          CONSTRAINT request_request_user_id_fkey FOREIGN KEY (request_user_id) REFERENCES users(id) ON UPDATE CASCADE

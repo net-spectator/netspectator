@@ -16,6 +16,7 @@
         <module>GatewayService</module>
         <module>UserManagementService</module>
         <module>WebDeviceService</module>
+        <module>Requests</module>
         <module>NotificationService</module>
         <module>LoggerService</module>
         <module>Requests</module>

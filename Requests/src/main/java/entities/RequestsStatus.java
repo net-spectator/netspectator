@@ -12,7 +12,7 @@ public class RequestsStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name = "id")
-    private long id;
+    private long UUID;
 
     @Column (name = "title")
     private String title;
