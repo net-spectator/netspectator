@@ -3,13 +3,15 @@ package org.net.usermanage.services;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.net.usermanage.converters.UserDetailsConverter;
-import org.net.usermanage.repositories.UserRepository;
+import org.net.usermanage.converters.DetailsConverter;
+import org.net.users.converters.UserConverter;
+import org.net.users.entities.Role;
+import org.net.users.entities.User;
+import org.net.users.entities.UserDetails;
+import org.net.users.repositories.UserRepository;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Service;
-import users.data.Role;
-import users.data.User;
-import users.data.UserDetails;
+import users.dtos.UserDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,7 +22,8 @@ import java.util.stream.Collectors;
 public class UserActualizeService {
 
     private final UserRepository userRepository;
-    private final UserDetailsConverter userDetailsConverter;
+    private final DetailsConverter detailsConverter;
+    private final UserConverter userConverter;
 
     private final RoleService roleService;
 
@@ -28,12 +31,8 @@ public class UserActualizeService {
         return userRepository.findByUuid(uuid);
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
-    }
-
     public void checkUser(BearerTokenAuthentication auth) {
-        UserDetails userDetails = userDetailsConverter.authToUserDetails(auth);
+        UserDetails userDetails = detailsConverter.authToUserDetails(auth);
         Collection<Role> roles = auth.getAuthorities().stream().map(
                 e -> roleService.getRole(e.toString())
         ).collect(Collectors.toList());

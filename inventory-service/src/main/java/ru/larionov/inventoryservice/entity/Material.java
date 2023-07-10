@@ -1,5 +1,6 @@
 package ru.larionov.inventoryservice.entity;
 
+import inventory.enums.StateEquipment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +32,7 @@ public class Material {
     @Column(name = "state")
     private StateEquipment state;
 
-    @Column(name = "responsible")
+    @Column(name = "responsible_id")
     private UUID responsible;
 
     @ManyToOne

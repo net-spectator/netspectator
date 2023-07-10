@@ -1,14 +1,15 @@
 package org.net.webcoreservice.controllers;
 
 import entities.devices.ClientHardwareInfo;
+import inventory.dtos.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.converters.TrackedEquipmentConverter;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
 import org.net.webcoreservice.exeptions.ResourceNotFoundException;
 import org.net.webcoreservice.service.TrackedEquipmentService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import utils.NSLogger;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ public class TrackedEquipmentController {
     private final TrackedEquipmentService trackedEquipmentService;
     private final TrackedEquipmentConverter converter;
 
+    private final NSLogger LOGGER = new NSLogger(TrackedEquipmentController.class); //добавил логгер
+
     @GetMapping
     public List<TrackedEquipmentDto> getAllEquipment() {
         return trackedEquipmentService.findAll().stream().map(converter::entityToDto).collect(Collectors.toList());
@@ -28,7 +31,39 @@ public class TrackedEquipmentController {
 
     @GetMapping("/hardwareInfo/{id}")
     public ClientHardwareInfo getHardwareInfo(@PathVariable Long id) {
+        LOGGER.info("Сработал логгер");
         return trackedEquipmentService.getEquipmentHardwareInfo(id);
+    }
+
+    @GetMapping("/broadcastSearch")
+    public void search(@RequestParam String ip) {
+        trackedEquipmentService.scanNetwork(ip);
+    }
+
+    @GetMapping("/nodes")
+    public List<DetectedNode> getAllNodes() {
+        return trackedEquipmentService.getNodes();
+    }
+
+    @PostMapping("/addToScan")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addToScan(@RequestParam int index, @RequestParam(required = false) String newName) {
+        if (newName.isEmpty()) {
+            trackedEquipmentService.addNodesByIndex(index);
+        } else {
+            trackedEquipmentService.addNodesWithChangeName(index, newName);
+        }
+    }
+
+    @DeleteMapping("/removeNode/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeFromNode(@PathVariable int id) {
+        trackedEquipmentService.removeNodeFromTrEq(id);
+    }
+
+    @PostMapping("/disconnect/{id}")
+    public void disconnectClient(@PathVariable Long id) {
+        trackedEquipmentService.disconnect(id);
     }
 
     @GetMapping("/blackList")
@@ -37,21 +72,15 @@ public class TrackedEquipmentController {
     }
 
     @PutMapping("/addBlackList/{id}")
-    public ResponseEntity<?> addClientToBlackList(@PathVariable Long id) {
-        if (!trackedEquipmentService.isExist(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void addClientToBlackList(@PathVariable Long id) {
         trackedEquipmentService.addToBlackList(id);
-        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/removeBlackList/{id}")
-    public ResponseEntity<?> removeClientToBlackList(@PathVariable Long id) {
-        if (!trackedEquipmentService.isExist(id)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void removeClientToBlackList(@PathVariable Long id) {
         trackedEquipmentService.removeFromBlackList(id);
-        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 
 
@@ -61,13 +90,8 @@ public class TrackedEquipmentController {
                 new ResourceNotFoundException("Оборудование с id:" + id + " не найдено")));
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createNewEquipment(@RequestBody TrackedEquipmentDto trackedEquipmentDto) {
-        trackedEquipmentService.createNewTrackedEquipment(trackedEquipmentDto);
-    }
-
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {
         trackedEquipmentService.deleteById(id);
     }

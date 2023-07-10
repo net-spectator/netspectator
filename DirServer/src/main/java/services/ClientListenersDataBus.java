@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 public class ClientListenersDataBus {
     private static volatile ClientListenersDataBus nettyDataBus;
@@ -29,12 +28,14 @@ public class ClientListenersDataBus {
     /**
      * Возвращает singleton текущего объекта
      */
-    public static synchronized ClientListenersDataBus getNettyDataBus() {
+    public static ClientListenersDataBus getNettyDataBus() {
         ClientListenersDataBus nb = nettyDataBus;
         if (nb == null) {
-            nb = nettyDataBus;
-            if (nb == null) {
-                nettyDataBus = nb = new ClientListenersDataBus();
+            synchronized (ClientListenersDataBus.class) {
+                nb = nettyDataBus;
+                if (nb == null) {
+                    nettyDataBus = nb = new ClientListenersDataBus();
+                }
             }
         }
         return nb;
@@ -50,7 +51,7 @@ public class ClientListenersDataBus {
     /**
      * Возвращает неизменяемый лист текущих подключений
      */
-    public static List<Connection> getConnectionsList() {
+    public static synchronized List<Connection> getConnectionsList() {
         return Collections.unmodifiableList(connections);
     }
 
@@ -114,7 +115,7 @@ public class ClientListenersDataBus {
     /**
      * Отключение клиента по индексу
      */
-    public static boolean disconnectClient(int index) {
+    public static synchronized boolean disconnectClient(int index) {
         try {
             Connection connection = connections.get(index);
             connection.closeConnection();
@@ -128,7 +129,7 @@ public class ClientListenersDataBus {
     /**
      * отключение клиента по device_id
      */
-    public static boolean disconnectClient(long deviceId) {
+    public static synchronized boolean disconnectClient(long deviceId) {
         try {
             Connection removedConnection = connections
                     .stream()
@@ -166,7 +167,7 @@ public class ClientListenersDataBus {
     /**
      * Возвращает текущую информацию о клиенте и состояние всех его сенсоров
      */
-    public static ClientHardwareInfo getClientHardwareInfo(long deviceId) {
+    public static synchronized ClientHardwareInfo getClientHardwareInfo(long deviceId) {
         Connection result = connections
                 .stream()
                 .filter(connection -> connection.getDevice().getId().equals(deviceId))

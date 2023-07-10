@@ -1,0 +1,196 @@
+version: '3.9'
+services:
+  user-manage-svc:
+    image: ns-usermanagesvc
+    build:
+      context: .
+      dockerfile: UserManagementService/Dockerfile
+    ports:
+      - "9080:9080"
+    environment:
+      SERVER_PORT: 9080
+      DB_HOST: keycloak-postgres
+      DB_PORT: 5432
+      DB_NAME: notifications
+      DB_USER: w0id
+      DB_PASSWORD: 2311
+      INTROSPECTION_URI: http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect
+      KEYCLOAK_SERVER_URI: http://keycloak:8080/
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
+  gateway-svc:
+    image: ns-gatewaysvc
+    build:
+      context: .
+      dockerfile: GatewayService/Dockerfile
+    ports:
+      - "9100:9100"
+    environment:
+      SERVER_PORT: 9100
+      INTROSPECTION_URI: http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect
+      USER_MANAGE_HOST: user-manage-svc:9080
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
+  user-svc:
+    image: ns-usersvc
+    build:
+      context: .
+      dockerfile: UserService/Dockerfile
+    ports:
+      - "9090:9090"
+    environment:
+      SERVER_PORT: 9090
+      DB_HOST: keycloak-postgres:5432
+      DB_NAME: notifications
+      DB_USER: w0id
+      DB_PASSWORD: 2311
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+
+  notification-svc:
+    image: ns-notificationsvc
+    build:
+      context: .
+      dockerfile: NotificationService/Dockerfile
+    ports:
+      - "8190:8190"
+    environment:
+      SERVER_PORT: 8190
+      DB_HOST: keycloak-postgres:5432
+      DB_NAME: notifications
+      DB_USER: w0id
+      DB_PASSWORD: 2311
+      BASE_URL: http://user-svc:9090
+      MQ_HOST: rabbitmq
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+
+  inventory-svc:
+    image: ns-inventorysvc
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    ports:
+      - "8085:8085"
+    environment:
+      IS_PORT: 8085
+      IS_DB_URL: keycloak-postgres:5432
+      IS_DB_USER: w0id
+      IS_DB_PASSWORD: 2311
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+
+  logger-svc:
+    image: loggersvc
+    build:
+      context: .
+      dockerfile: LoggerService/Dockerfile
+    ports:
+      - "9070:9070"
+    environment:
+      SERVER_PORT: 9070
+      MONGODB_HOST: mongodb
+      MQ_HOST: rabbitmq
+
+  web-device-svc:
+    image: ns-webdevicesvc
+    build:
+      context: .
+      dockerfile: WebDeviceService/Dockerfile
+    ports:
+      - "8181:8181"
+      - "5679:5679"
+    environment:
+      SERVER_PORT: 8181
+      DB_HOST: keycloak-postgres:5432
+      DB_NAME: deviceService
+      DB_USERNAME: w0id
+      DB_PASSWORD: 2311
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+
+  keycloak-postgres:
+    image: library/postgres:${KC_POSTGRES_IMAGE_TAG:-14}
+    container_name: ${POSTGRES_CONTAINER_NAME:-ns-postgres}
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: ./docker/docker-postgresql-multiple-databases
+        target: /docker-entrypoint-initdb.d
+        read_only: true
+    environment:
+      POSTGRES_USER: w0id
+      POSTGRES_PASSWORD: 2311
+      POSTGRES_MULTIPLE_DATABASES: keycloak,"ns-user-manage","deviceService","db_is",notifications
+    healthcheck:
+      test: pg_isready -d postgres
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    ports:
+      - ${KC_POSTGRES_PORT_MAPPING:-5435}:5432
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:20.0.2
+    #    build: keycloak
+    container_name: ns-keycloak
+    command:
+      - start --auto-build --db postgres --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm --spi-user-profile-legacy-user-profile-read-only-attributes *_RES_ACCESS_MODE
+    environment:
+      KC_DB_URL: jdbc:postgresql://keycloak-postgres:5432/keycloak
+      KC_DB_USERNAME: w0id
+      KC_DB_PASSWORD: 2311
+      KC_DB_SCHEMA: public
+      KC_FEATURES: preview
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_IMPORT: /opt/keycloak/data/import/keycloak-users-0.json -Dkeycloak.profile.feature.upload_scripts=enabled
+    volumes:
+      - ./docker/keycloak/:/opt/keycloak/data/import/:ro
+    ports:
+      - 8282:8080
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8080/realms/master"]
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 5s
+
+  rabbitmq:
+    image: rabbitmq:3.11.7-management
+    container_name: ns-rabbitmq
+    command: rabbitmq-server
+    volumes:
+      - ./docker/rabbitmq/conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./docker/rabbitmq/conf/definitions.json:/etc/rabbitmq/definitions.json:ro
+    environment:
+      RABBITMQ_DEFAULT_USER: rmuser
+      RABBITMQ_DEFAULT_PASS: rmpassword
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  mongodb:
+    image: mongo:6.0.1
+    container_name: ns-mongodb
+    ports:
+      - 27017:27017
+    command: ["mongod", "--port", "27017"]
+    volumes:
+      - ./docker/dbdata:/data/db

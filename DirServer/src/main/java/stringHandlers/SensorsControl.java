@@ -1,6 +1,7 @@
 package stringHandlers;
 
 import entities.Connection;
+import utils.MessageSender;
 
 public class SensorsControl {
     private final MessageSender messageSender;

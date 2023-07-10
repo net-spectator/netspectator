@@ -1,5 +1,6 @@
 package ru.larionov.inventoryservice.entity;
 
+import inventory.enums.StateEquipment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,10 +29,10 @@ public class Device {
     @Column(name = "state")
     private StateEquipment state;
 
-    @Column(name = "responsible")
+    @Column(name = "responsible_id")
     private UUID responsible;
 
-    @Column(name = "user")
+    @Column(name = "user_id")
     private UUID user;
 
     @ManyToOne

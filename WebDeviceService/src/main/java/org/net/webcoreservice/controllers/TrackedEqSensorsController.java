@@ -3,11 +3,10 @@ package org.net.webcoreservice.controllers;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.converters.TrackedEqSensorsConverter;
 import org.net.webcoreservice.dto.TrackedEqSensorsDto;
-import org.net.webcoreservice.exeptions.AppError;
 import org.net.webcoreservice.service.TrackedEqSensorsService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import services.ClientListenersDataBus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +26,8 @@ public class TrackedEqSensorsController {
     }
 
     @DeleteMapping
-    public void deleteSensorFromEquipment(@RequestParam Long sensorId, @RequestParam Long equipId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSensorFromEquipment(@RequestParam Long sensorId, Long equipId) {
         trackedEqSensorsService.deleteSensorFromEquipment(sensorId, equipId);
     }
 
@@ -38,19 +38,13 @@ public class TrackedEqSensorsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addSensorInEquip(@RequestBody TrackedEqSensorsDto dto) {
-        if (dto.getSensorId() < 0 || dto.getEquipmentId() < 0) {
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(),
-                    "id сенсора или оборудования не могут быть отрицательными"), HttpStatus.BAD_REQUEST);
-        }
-        if (!trackedEqSensorsService.sensorOrVapExists(dto.getSensorId(), dto.getEquipmentId())) {
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(),
-                    "Такого сенсора или оборудования не существует"), HttpStatus.BAD_REQUEST);
-        }
-        if (trackedEqSensorsService.isExists(dto.getSensorId(), dto.getEquipmentId())) {
-            return new ResponseEntity<>(new AppError(HttpStatus.BAD_REQUEST.value(), "Связь уже существует"), HttpStatus.BAD_REQUEST);
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addSensorInEquip(@RequestBody TrackedEqSensorsDto dto) {
         trackedEqSensorsService.addSensorInEquipment(dto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        disconnect(dto.getEquipmentId());
+    }
+
+    private void disconnect(Long equipmentId) {
+        ClientListenersDataBus.disconnectClient(equipmentId);
     }
 }

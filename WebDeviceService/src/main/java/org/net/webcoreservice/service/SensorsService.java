@@ -27,9 +27,9 @@ public class SensorsService {
         sensorsRepository.deleteById(id);
     }
 
-    public void createNewSensor(SensorDto sensorDto) {
+    public Sensors createNewSensor(String title) {
         Sensors sensors = new Sensors();
-        sensors.setSensorTitle(sensorDto.getTitle());
-        sensorsRepository.save(sensors);
+        sensors.setSensorTitle(title);
+        return sensorsRepository.save(sensors);
     }
 }

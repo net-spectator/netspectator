@@ -1,16 +1,18 @@
 server:
-  port: 9090
+  port: ${SERVER_PORT:9080}
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
   security:
     oauth2:
       resourceserver:
         opaquetoken:
-          introspection-uri: http://localhost:9500/realms/netspectator/protocol/openid-connect/token/introspect
+          introspection-uri: ${INTROSPECTION_URI:http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect}
           client-id: javaclient
           client-secret: ZnMtpRXWvGO3h4CSHAGmAtAanTfTAuri
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ns-user-manage
+    url: jdbc:postgresql://keycloak-postgres:5432/ns-user-manage
     username: w0id
     password: 2311
   jpa:
@@ -24,11 +26,12 @@ spring:
         size: 5
 check-delay: 60000
 realm: netspectator
+type-attribute: ns_user
 keycloak:
   management:
     props:
-      server-url: http://localhost:9500/
-      master-realm: master
+      server-url: ${KEYCLOAK_SERVER_URI:http://keycloak:8080/}
+      master-realm: netspectator
       username: ns-reader
       password: 2311
       client-id: admin-cli

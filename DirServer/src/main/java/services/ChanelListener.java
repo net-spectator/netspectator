@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import entities.Connection;
 import entities.TrackedEquipment;
 import entities.devices.ClientHardwareInfo;
+import enums.Help;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.RequiredArgsConstructor;
 import stringHandlers.*;
 import org.apache.log4j.Logger;
+import utils.MessageSender;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,9 +25,10 @@ public class ChanelListener {
     private final MessageSender messageSender;
     private final ConnectionsList connections;
     private final DisabledClientsControl blackList;
-    private final Connection client;
+    private final Connection connection;
     private final ServerControl server;
-    private final DataBaseService dbService;
+    private final NodesControl nodesControl;
+    private ClientHardwareAnalyzer hardwareAnalyzer;
     private static final Logger LOGGER = Logger.getLogger(ChanelListener.class);
 
     public void listen(ChannelHandlerContext ctx, Object msg) throws IOException {
@@ -35,37 +38,44 @@ public class ChanelListener {
                 .replace("\n", "")
                 .replace("\r", "")
                 .split(" ", 0);
-        LOGGER.info(String.format("Received header with content: [%s]", byteBuf.toString(StandardCharsets.UTF_8)));
 
         if (header[0].toLowerCase().contains("ssh")) {
             ctx.disconnect();
         }
 
+        if (!header[0].equals("\\ClientHardwareInfo")) {
+            LOGGER.info(String.format("Received header with content: [%s]", request));
+        }
+
         /*  \\ - автоматический режим работы агента, / - интерактивный режим работы агента */
         switch (header[0]) {
+            //---------------------------------------------------------------------------приветствие
             case "/hello":
                 messageSender.sendMessageWithHeader("Welcome to Net Spectator server. ");
                 break;
+            //---------------------------------------------------------------------------авторизация в режиме консоли
             case "/auth":
-                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("admin"))) {
-                    client.setAuth(true);
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.getProperties(("admin")))) {
+                    connection.setAuth(true);
                     messageSender.sendMessageWithHeader("Authorization ok");
-                    TrackedEquipment device = new TrackedEquipment(); //убрать этот момент, имя должно браться настоящее
+                    TrackedEquipment device = new TrackedEquipment();
                     device.setEquipmentTitle("Admin");
-                    client.setDevice(device);
+                    connection.setDevice(device);
                 } else {
                     messageSender.sendMessageWithHeader("Wrong key");
                 }
                 break;
+            //-----------------------------------------------------------------------авторизация в автоматическом режиме
             case "\\auth":
-                if (header.length > 1 && header[1].equals(ClientListenersStarter.serverParams.get("publicKey"))) {
-                    client.setAuth(true);
+                if (header.length > 1 && header[1].equals(ClientListenersStarter.getProperties("publicKey"))) {
+                    connection.setAuth(true);
                     messageSender.sendMessageWithoutHeader("getId");
                 } else {
                     ClientListenersDataBus.disableClient(ctx.channel().localAddress());
                     ctx.disconnect();
                 }
                 break;
+            //---------------------------------------------------------------------------получение ClientID
             case "\\clientID":
                 if (header.length < 2) { //не забыть проверить уникальность ID по базе
                     LOGGER.info("Подключается новое устройство. Присваиваю новый ID");
@@ -75,44 +85,63 @@ public class ChanelListener {
                 } else {
                     uuid = header[1];
                 }
-                ClientListenersDataBus.addConnection(client);
+                ClientListenersDataBus.addConnection(connection);
                 messageSender.sendMessageWithoutHeader("getName");
                 break;
+            //---------------------------------------------------------------------------получение имени клиента
             case "\\clientName":
                 LOGGER.info(String.format("Имя клиента: [%s]", header[1]));
                 deviceInit(ctx, header);
                 messageSender.sendMessageWithoutHeader("getMac");
                 break;
-            case "\\macAddress":
-                LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
-                client.getDevice().setEquipmentMacAddress(header[1]);
-                dbService.updateTrackedEquipment(client.getDevice());
+            //------------------------------------------------------------------------включение сенсоров клиента
+            case "\\getSensors":
                 StringBuilder sensors = new StringBuilder();
-                client.getDevice()
+                connection.getDevice()
                         .getTrackedEquipmentSensorsList()
-                        .forEach(trackedEquipmentSensors -> sensors.append(" ")
+                        .forEach(trackedEquipmentSensors -> sensors.append(" ") // TODO: 23.06.2023 при первом подключении клиента выскакивает nullPointer и соединение обрывается
                                 .append(trackedEquipmentSensors
                                         .getSensors()
                                         .getSensorTitle()));
                 messageSender.sendMessageWithoutHeader("startSensors" + sensors);
                 break;
+            //-------------------------------------------------------получение MAC-адреса/отправка настроек логирования
+            case "\\macAddress":
+                LOGGER.info(String.format("MAC клиента: [%s]", header[1]));
+                connection.getDevice().setEquipmentMacAddress(header[1]);
+                DataBaseService.updateTrackedEquipment(connection.getDevice());
+                messageSender.sendMessageWithoutHeader("slog " + (connection.getDevice().getServerLog()));
+                break;
+            //---------------------------------------------------------------------------выключение сервера
             case "/shutdown":
                 server.shutdown();
                 break;
+            //---------------------------------------------------------------------------управление подключениями
             case "/connections":
                 if (!connections.connectionListOperator(ctx, header)) {
                     LOGGER.info("Bad command");
                 }
                 break;
-            case "/disabledList":
+            //---------------------------------------------------------------------------управление черным списком
+            case "/disconnected":
                 if (!blackList.disabledClientsListOperator(header)) {
                     LOGGER.info("Bad command");
                 }
                 break;
-            case "\\ClientHardwareInfo":  //в процессе доработки
+            //---------------------------------------------------------------------------получение списка сетевых узлов
+            case "/nodes":
+                nodesControl.nodesOperator(header);
+                break;
+            case "/?":
+                messageSender.sendMessageWithHeader(Help.getRootHelp());
+                break;
+            //---------------------------------------------------------------------------получение состояния клиента
+            case "\\ClientHardwareInfo":
                 ObjectMapper mapper = new ObjectMapper();
                 ClientHardwareInfo deviceInfo = mapper.readValue(request.substring(20), ClientHardwareInfo.class);
-                client.getDevice().setDeviceInfo(deviceInfo);
+                connection.getDevice().setDeviceInfo(deviceInfo);
+                hardwareAnalyzer.check(deviceInfo);
+                break;
             default:
                 messageSender.sendMessageWithHeader("Unknown command");
                 break;
@@ -120,18 +149,19 @@ public class ChanelListener {
     }
 
     private void deviceInit(ChannelHandlerContext ctx, String[] args) {
-        TrackedEquipment device = dbService.getTrackedEquipmentByUUID(uuid);  // TODO: 19.06.2023 проверка уникальности клиента должна осуществляться по ip, mac и UUID
+        TrackedEquipment device = DataBaseService.getTrackedEquipmentByUUID(uuid);  // TODO: 19.06.2023 проверка уникальности клиента должна осуществляться по ip, mac и UUID
         if (device == null) {
             device = new TrackedEquipment();
             device.setEquipmentTitle(args[1]);
             device.setEquipmentUuid(uuid);
-            LOGGER.info(dbService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
+            LOGGER.info(DataBaseService.addTrackedEquipment(device) > 0 ? "Клиент успешно добавлен в базу" : "Ошибка добавления клиента в базу");
         }
         device.setEquipmentOnlineStatus(ONLINE.getStatus());
         device.setEquipmentIpAddress(ctx.channel().localAddress()
                 .toString()
                 .replace("/", ""));
-        dbService.updateTrackedEquipment(device);
-        client.setDevice(device);
+        DataBaseService.updateTrackedEquipment(device);
+        connection.setDevice(device);
+        hardwareAnalyzer = new ClientHardwareAnalyzer(connection.getDevice());
     }
 }

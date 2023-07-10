@@ -1,5 +1,6 @@
 package ru.larionov.inventoryservice.entity;
 
+import inventory.enums.RegistrationEventsType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

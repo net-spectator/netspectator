@@ -1,15 +1,15 @@
 package stringHandlers;
 
 import entities.Connection;
+import enums.Help;
 import services.ClientListenersDataBus;
+import utils.MessageSender;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DisabledClientsControl {
     private final MessageSender messageSender;
-
     private final Connection client;
-
     public DisabledClientsControl(MessageSender messageSender, Connection client) {
         this.messageSender = messageSender;
         this.client = client;
@@ -69,6 +69,9 @@ public class DisabledClientsControl {
                 }
                 messageSender.sendMessageWithHeader("Operation complete");
                 return true;
+            case "?":
+                messageSender.sendMessageWithHeader(Help.getDisconnectedHelp());
+                break;
             default:
                 messageSender.sendMessageWithHeader("Bad command");
                 break;

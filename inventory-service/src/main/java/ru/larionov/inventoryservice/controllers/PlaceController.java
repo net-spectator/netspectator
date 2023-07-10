@@ -2,7 +2,7 @@ package ru.larionov.inventoryservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.larionov.inventoryservice.dto.PlaceDTO;
+import inventory.dtos.PlaceDTO;
 import ru.larionov.inventoryservice.services.PlaceService;
 
 import java.util.List;

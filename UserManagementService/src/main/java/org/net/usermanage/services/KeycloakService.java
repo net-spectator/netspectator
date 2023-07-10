@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.net.users.entities.Role;
+import org.net.users.entities.User;
+import org.net.users.entities.UserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import users.data.Role;
-import users.data.User;
-import users.data.UserDetails;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,10 +27,14 @@ public class KeycloakService {
 
   @Value("${realm}")
   private String realm;
+
+  @Value("${type-attribute}")
+  private String type;
+
   private Map<String, Object> attributes;
 
   public List<UserRepresentation> getUsers() {
-    return keycloak.realm(realm).users().list();
+    return keycloak.realm(realm).users().searchByAttributes("type:" + type);
   }
 
   public List<Role> getMappedRoles(String id) {

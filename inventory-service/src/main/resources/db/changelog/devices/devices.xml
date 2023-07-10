@@ -29,9 +29,9 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
 
         <column name="state" type="tinyint"/>
 
-        <column name="responsible" type="uuid"/>
+        <column name="responsible_id" type="uuid"/>
 
-        <column name="user" type="uuid"/>
+        <column name="user_id" type="uuid"/>
 
         <column name="type_id" type="uuid"/>
 

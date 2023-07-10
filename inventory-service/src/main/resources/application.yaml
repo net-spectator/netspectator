@@ -1,10 +1,10 @@
 server:
-  port: ${IS_PORT:8080}
+  port: ${IS_PORT:8083}
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${IS_DB_URL:localhost:5433}/${IS_DB_NAME:db_is}
-    username: ${IS_DB_USER:postgres}
+    url: jdbc:postgresql://${IS_DB_URL:192.170.0.100:5432}/${IS_DB_NAME:db_is}
+    username: ${IS_DB_USER:spring_user}
     password: ${IS_DB_PASSWORD:157456Lb}
   jpa:
     show-sql: true
@@ -13,3 +13,13 @@ spring:
       ddl-auto: validate
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
+  rabbitmq:
+    template:
+      exchange: netspectator-exchange
+    host: ${MQ_HOST:localhost}
+    username: ${MQ_USERNAME:name}
+    password: ${MQ_PASSWORD:123}
+    virtual-host: ns
+user_service:
+  host: ${US_HOST:localhost}
+  port: ${US_PORT:8080}

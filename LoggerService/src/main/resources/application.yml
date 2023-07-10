@@ -1,0 +1,25 @@
+server:
+  port: ${SERVER_PORT:9060}
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoDataAutoConfiguration
+#logging:
+#  level:
+#    root: debug
+spring:
+  rabbitmq:
+    host: ${MQ_HOST:localhost}
+    username: nsmqreader
+    password: 2311
+    virtual-host: ns
+    template:
+      exchange: netspectator-exchange
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:mongodb}
+mongo:
+  database: netspectator
+  collection: logs

@@ -8,6 +8,14 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
+        <repositories>
+            <repository>
+                <id>project.local</id>
+                <name>netspactator</name>
+                <url>file:${project.basedir}/repo</url>
+            </repository>
+        </repositories>
+
 
     <dependencyManagement>
         <dependencies>
@@ -90,10 +98,30 @@
             <artifactId>keycloak-admin-client</artifactId>
             <version>21.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.net</groupId>
+            <artifactId>UserService</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>org.net.usermanage.UserManageApplication</mainClass>
+                    <layout>JAR</layout>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -120,6 +148,7 @@
 
     <properties>
         <oauth2-oidc-sdk.version>9.19</oauth2-oidc-sdk.version>
+        <start-class>org.net.usermanage.UserManageApplication</start-class>
     </properties>
 
 </project>

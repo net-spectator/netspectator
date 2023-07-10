@@ -5,15 +5,15 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://localhost:5432/deviceService</property>
-        <property name="connection.username">postgres</property>
-        <property name="connection.password">root</property>
+        <property name="connection.url">jdbc:postgresql://keycloak-postgres:5432/deviceService</property>
+        <property name="connection.username">w0id</property>
+        <property name="connection.password">2311</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL10Dialect</property>
         <property name="show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
         <property name="current_session_context_class">thread</property>
         <mapping class="entities.TrackedEquipment"/>
-        <mapping class="entities.Routers"/>
+        <mapping class="entities.EquipmentType"/>
         <mapping class="entities.Sensors"/>
         <mapping class="entities.TrackedEquipmentSensors"/>
     </session-factory>

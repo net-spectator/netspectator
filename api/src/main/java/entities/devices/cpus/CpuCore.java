@@ -7,6 +7,6 @@ import lombok.Data;
 public class CpuCore {
     @JsonProperty("coreName")
     private String coreName;
-    @JsonProperty("temperature")
-    private long temperature;
+    @JsonProperty("coreTemperature")
+    private double coreTemperature;
 }

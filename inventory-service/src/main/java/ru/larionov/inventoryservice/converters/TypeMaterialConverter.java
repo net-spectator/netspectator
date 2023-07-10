@@ -1,6 +1,6 @@
 package ru.larionov.inventoryservice.converters;
 
-import ru.larionov.inventoryservice.dto.TypeMaterialDTO;
+import inventory.dtos.TypeMaterialDTO;
 import ru.larionov.inventoryservice.entity.TypeMaterial;
 
 public class TypeMaterialConverter {

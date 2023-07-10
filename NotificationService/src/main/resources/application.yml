@@ -1,0 +1,40 @@
+server:
+  port: ${SERVER_PORT:8190}
+  servlet:
+    context-path: /notification
+spring:
+  rabbitmq:
+    host: ${MQ_HOST:rabbitmq}
+    username: nsmqreader
+    password: 2311
+    virtual-host: ns
+    template:
+      exchange: netspectator-exchange
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:keycloak-postgres:5432}/${DB_NAME:notifications}
+    username: ${DB_USER:w0id}
+    password: ${DB_PASSWORD:2311}
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: netspectator0000@gmail.com
+    password: mhyuzktmiahlgzec
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    sender:
+      email: netspectator0000@gmail.com
+
+base-url: ${BASE_URL}

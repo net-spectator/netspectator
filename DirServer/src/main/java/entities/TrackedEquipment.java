@@ -2,7 +2,6 @@ package entities;
 
 import entities.devices.ClientHardwareInfo;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -40,6 +39,9 @@ public class TrackedEquipment {
     @Column(name = "black_list", columnDefinition = "integer default 0")
     private int blackList;
 
+    @Column(name = "server_log", columnDefinition = "integer default 0")
+    private int serverLog;
+
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -47,9 +49,15 @@ public class TrackedEquipment {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "type")
+    private EquipmentType typeId;
+
     @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "trackedEquipment", cascade = CascadeType.ALL)
     private List<TrackedEquipmentSensors> trackedEquipmentSensorsList;
+
     @Transient
     private ClientHardwareInfo deviceInfo;
 }

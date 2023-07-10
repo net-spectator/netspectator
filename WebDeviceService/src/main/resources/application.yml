@@ -1,13 +1,13 @@
 server:
-  port: 8181
+  port: ${SERVER_PORT:8181}
   servlet:
     context-path: /core
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/deviceService
-    username: postgres
-    password: root
+    url: jdbc:postgresql://${DB_HOST:keycloak-postgres:5432}/${DB_NAME:deviceService}
+    username: ${DB_USERNAME:w0id}
+    password: ${DB_PASSWORD:2311}
   jpa:
     show-sql: true
     properties:

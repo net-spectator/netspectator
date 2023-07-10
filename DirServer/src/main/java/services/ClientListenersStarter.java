@@ -6,24 +6,31 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.apache.log4j.Logger;
+import utils.NSLogger;
+import utils.converter.PropertiesOperator;
 
-import java.util.HashMap;
+import java.util.Properties;
 
 public final class ClientListenersStarter {
     private static EventLoopGroup auth;
     private static EventLoopGroup worker;
     private static int PORT;
-    public static HashMap<String, String> serverParams;
-    private static final Logger LOGGER = Logger.getLogger(ClientListenersStarter.class);
+    private static String PROPERTIES_PATH = "resources/server.properties";
+    public static Properties properties;
+    private static final NSLogger LOGGER = new NSLogger(ClientListenersStarter.class);
+
+    public static String getProperties(String key) {
+        return properties.get(key).toString();
+    }
 
     public ClientListenersStarter() {
         ClientListenersDataBus.getNettyDataBus();
+        NodeListener.startNodeListener();
         initParams();
         serverStart();
     }
 
-    private static void serverStart(){
+    private static void serverStart() {
         auth = new NioEventLoopGroup(1);
         worker = new NioEventLoopGroup();
 
@@ -44,7 +51,7 @@ public final class ClientListenersStarter {
             ChannelFuture future = bootstrap.bind(PORT).sync();
             LOGGER.info("Server start");
             future.channel().closeFuture().sync();
-            System.out.println("Server finished");
+            LOGGER.info("Server finished");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -53,11 +60,13 @@ public final class ClientListenersStarter {
         }
     }
 
-    private static void initParams(){
-        serverParams = ServerFileReader.initFileParams("server.ini");
-        assert serverParams != null;
-        PORT = Integer.parseInt(serverParams.get("Port"));
-        LOGGER.info(String.format("Сервер прослушивает порт: [%s]", PORT));
+    private static void initParams() {
+        properties = PropertiesOperator.returnProperties(PROPERTIES_PATH);
+        if (properties != null) {
+            PORT = Integer.parseInt(properties.get("port").toString());
+            LOGGER.info(String.format("Сервер прослушивает порт: [%s]", PORT));
+
+        }
     }
 
     public static void shutdownServer() {
@@ -72,4 +81,4 @@ public final class ClientListenersStarter {
  * printer
  * server
  * workstation
- * */
+ */

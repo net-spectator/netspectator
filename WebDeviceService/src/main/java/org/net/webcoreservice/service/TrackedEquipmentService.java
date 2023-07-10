@@ -1,13 +1,16 @@
 package org.net.webcoreservice.service;
 
 import entities.devices.ClientHardwareInfo;
+import inventory.dtos.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.Enum.BlackListStatus;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
 import org.net.webcoreservice.entities.TrackedEquipment;
+import org.net.webcoreservice.exeptions.ResourceNotFoundException;
 import org.net.webcoreservice.repository.TrackedEquipmentRepository;
 import org.springframework.stereotype.Service;
 import services.ClientListenersDataBus;
+import services.NodeListener;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,11 +38,17 @@ public class TrackedEquipmentService {
     }
 
     public void addToBlackList(Long id) {
+        if (!isExist(id)) {
+            throw new ResourceNotFoundException("Оборудование с id" + id + " не найдено.");
+        }
         blackListOperation(id, BlackListStatus.DISABLE.getStatus());
         disconnect(id);
     }
 
     public void removeFromBlackList(Long id) {
+        if (!isExist(id)) {
+            throw new ResourceNotFoundException("Устройства с id" + id + " не найдено.");
+        }
         blackListOperation(id, BlackListStatus.ENABLE.getStatus());
     }
 
@@ -51,14 +60,34 @@ public class TrackedEquipmentService {
         return ClientListenersDataBus.getClientHardwareInfo(id);
     }
 
-    public void createNewTrackedEquipment(TrackedEquipmentDto trackedEquipmentDto) {
+    public void scanNetwork(String ip) {
+        NodeListener.nodeBroadcastSearch(ip);
+    }
+
+    public List<DetectedNode> getNodes(){
+        return NodeListener.getDetectedNodes();
+    }
+
+    public void addNodesByIndex(int index) {
+        NodeListener.addNodeForTracking(index);
+    }
+
+    public void addNodesWithChangeName(int index, String newName) {
+        NodeListener.addNodeForTracking(index, newName);
+    }
+
+    public void removeNodeFromTrEq(int id) {
+        NodeListener.removeNodeFromTrackingById(id);
+    }
+
+    public TrackedEquipment createNewTrackedEquipment(TrackedEquipmentDto trackedEquipmentDto) {
         TrackedEquipment trackedEquipment = new TrackedEquipment();
         trackedEquipment.setEquipmentUuid(trackedEquipmentDto.getUuid());
         trackedEquipment.setEquipmentTitle(trackedEquipmentDto.getTitle());
         trackedEquipment.setEquipmentIpAddress(trackedEquipmentDto.getIp());
         trackedEquipment.setEquipmentOnlineStatus(trackedEquipmentDto.getOnlineStatus());
         trackedEquipment.setEquipmentMacAddress(trackedEquipmentDto.getMac());
-        trackedEquipmentRepository.save(trackedEquipment);
+        return trackedEquipmentRepository.save(trackedEquipment);
     }
 
     public void blackListOperation(Long id, int blackListStatus) {

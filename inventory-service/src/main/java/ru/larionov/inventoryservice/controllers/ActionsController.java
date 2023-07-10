@@ -1,11 +1,10 @@
 package ru.larionov.inventoryservice.controllers;
 
-import jakarta.servlet.Registration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.larionov.inventoryservice.dto.PairRegistrationNumbers;
-import ru.larionov.inventoryservice.dto.RegistrationDataDTO;
-import ru.larionov.inventoryservice.dto.Response;
+import inventory.dtos.RegistrationDataDTO;
+import http.dtos.Response;
 import ru.larionov.inventoryservice.services.InventoryActionsService;
 
 import java.time.LocalDateTime;
