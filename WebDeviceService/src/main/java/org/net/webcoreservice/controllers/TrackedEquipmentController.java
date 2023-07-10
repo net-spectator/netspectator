@@ -1,15 +1,13 @@
 package org.net.webcoreservice.controllers;
 
 import entities.devices.ClientHardwareInfo;
-import entities.nodes.DetectedNode;
+import inventory.dtos.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.converters.TrackedEquipmentConverter;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
-import org.net.webcoreservice.entities.TrackedEquipment;
 import org.net.webcoreservice.exeptions.ResourceNotFoundException;
 import org.net.webcoreservice.service.TrackedEquipmentService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utils.NSLogger;
 

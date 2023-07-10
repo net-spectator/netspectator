@@ -1,4 +1,4 @@
-package entities.nodes;
+package inventory.dtos.nodes;
 
 import lombok.Data;
 

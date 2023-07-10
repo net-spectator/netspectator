@@ -11,7 +11,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RequestsStatusService {
     private final RequestsStatusRepository requestsStatusRepository;
-
     public Optional<RequestsStatus>findByTitle(String title){
         return requestsStatusRepository.findByTitle(title);
     }

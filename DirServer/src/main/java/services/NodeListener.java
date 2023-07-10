@@ -1,7 +1,7 @@
 package services;
 
 import entities.EquipmentType;
-import entities.nodes.DetectedNode;
+import inventory.dtos.nodes.DetectedNode;
 import entities.TrackedEquipment;
 import utils.NSLogger;
 
