@@ -6,6 +6,6 @@ RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true spring-boot:repacka
 
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/*.jar /app/*.jar
+COPY --from=builder /app/target/*.jar /app/NotificationService.jar
 EXPOSE 8190
-ENTRYPOINT ["java", "-jar", "/app/*.jar"]
+ENTRYPOINT ["java", "-jar", "/app/NotificationService.jar"]
