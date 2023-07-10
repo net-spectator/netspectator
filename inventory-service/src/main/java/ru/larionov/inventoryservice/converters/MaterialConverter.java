@@ -2,6 +2,8 @@ package ru.larionov.inventoryservice.converters;
 
 import ru.larionov.inventoryservice.dto.MaterialDTO;
 import ru.larionov.inventoryservice.entity.Material;
+import ru.larionov.inventoryservice.entity.RegistrationNumber;
+import ru.larionov.inventoryservice.views.MaterialWithDetailsDTO;
 
 public class MaterialConverter {
 
@@ -15,9 +17,25 @@ public class MaterialConverter {
         materialDTO.setSerialNumber(material.getSerialNumber());
         materialDTO.setState(material.getState());
         materialDTO.setResponsible(material.getResponsible());
-        materialDTO.setTypeMaterial(material.getTypeMaterial());
-        materialDTO.setVendor(material.getVendor());
+        materialDTO.setTypeMaterial(TypeMaterialConverter.toDTO(material.getTypeMaterial()));
+        materialDTO.setVendor(VendorConverter.toDTO(material.getVendor()));
         materialDTO.setRegistrationNumber(material.getRegistrationNumber());
+
+        return materialDTO;
+    }
+
+    public static MaterialDTO toDTO(MaterialWithDetailsDTO material) {
+        MaterialDTO materialDTO = new MaterialDTO();
+
+        materialDTO.setId(material.getId());
+        materialDTO.setName(material.getName());
+        materialDTO.setDescription(material.getDescription());
+        materialDTO.setSerialNumber(material.getSerialNumber());
+        materialDTO.setState(material.getState());
+        materialDTO.setResponsible(material.getResponsible());
+        materialDTO.setTypeMaterial(TypeMaterialConverter.toDTO(material.getTypeMaterial()));
+        materialDTO.setVendor(VendorConverter.toDTO(material.getVendor()));
+        materialDTO.setRegistrationNumber(new RegistrationNumber(material.getRegistrationNumber()));
 
         return materialDTO;
     }
@@ -32,8 +50,8 @@ public class MaterialConverter {
         material.setSerialNumber(materialDTO.getSerialNumber());
         material.setState(materialDTO.getState());
         material.setResponsible(materialDTO.getResponsible());
-        material.setTypeMaterial(materialDTO.getTypeMaterial());
-        material.setVendor(materialDTO.getVendor());
+        material.setTypeMaterial(TypeMaterialConverter.fromDTO(materialDTO.getTypeMaterial()));
+        material.setVendor(VendorConverter.fromDTO(materialDTO.getVendor()));
         material.setRegistrationNumber(materialDTO.getRegistrationNumber());
 
         return material;

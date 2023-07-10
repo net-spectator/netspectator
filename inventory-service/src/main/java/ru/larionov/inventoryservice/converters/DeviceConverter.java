@@ -2,6 +2,8 @@ package ru.larionov.inventoryservice.converters;
 
 import ru.larionov.inventoryservice.dto.DeviceDTO;
 import ru.larionov.inventoryservice.entity.Device;
+import ru.larionov.inventoryservice.entity.RegistrationNumber;
+import ru.larionov.inventoryservice.views.DeviceWithDetailsDTO;
 
 public class DeviceConverter {
 
@@ -10,13 +12,34 @@ public class DeviceConverter {
 
         deviceDTO.setId(device.getId());
         deviceDTO.setName(device.getName());
-        deviceDTO.setDescription(device.getName());
+        deviceDTO.setDescription(device.getDescription());
         deviceDTO.setResponsible(device.getResponsible());
         deviceDTO.setState(device.getState());
         deviceDTO.setRegistrationNumber(device.getRegistrationNumber());
-        deviceDTO.setTypeMaterial(device.getTypeMaterial());
-        deviceDTO.setVendor(device.getVendor());
+        if (device.getTypeMaterial() != null)
+            deviceDTO.setTypeMaterial(TypeMaterialConverter.toDTO(device.getTypeMaterial()));
+        if (device.getVendor() != null)
+            deviceDTO.setVendor(VendorConverter.toDTO(device.getVendor()));
         deviceDTO.setUser(device.getUser());
+
+        return deviceDTO;
+    }
+
+    public static DeviceDTO toDTO(DeviceWithDetailsDTO device) {
+        DeviceDTO deviceDTO = new DeviceDTO();
+
+        deviceDTO.setId(device.getId());
+        deviceDTO.setName(device.getName());
+        deviceDTO.setDescription(device.getDescription());
+        deviceDTO.setResponsible(device.getResponsibleId());
+        deviceDTO.setState(device.getState());
+        if (device.getRegistrationNumber() != null)
+            deviceDTO.setRegistrationNumber(new RegistrationNumber(device.getRegistrationNumber()));
+        if (device.getTypeMaterial() != null)
+            deviceDTO.setTypeMaterial(TypeMaterialConverter.toDTO(device.getTypeMaterial()));
+        if (device.getVendor() != null)
+            deviceDTO.setVendor(VendorConverter.toDTO(device.getVendor()));
+        deviceDTO.setUser(device.getUserId());
 
         return deviceDTO;
     }
@@ -26,12 +49,14 @@ public class DeviceConverter {
 
         device.setId(deviceDTO.getId());
         device.setName(deviceDTO.getName());
-        device.setDescription(deviceDTO.getName());
+        device.setDescription(deviceDTO.getDescription());
         device.setResponsible(deviceDTO.getResponsible());
         device.setState(deviceDTO.getState());
         device.setRegistrationNumber(deviceDTO.getRegistrationNumber());
-        device.setTypeMaterial(deviceDTO.getTypeMaterial());
-        device.setVendor(deviceDTO.getVendor());
+        if (deviceDTO.getTypeMaterial() != null)
+            device.setTypeMaterial(TypeMaterialConverter.fromDTO(deviceDTO.getTypeMaterial()));
+        if (deviceDTO.getVendor() != null)
+            device.setVendor(VendorConverter.fromDTO(deviceDTO.getVendor()));
         device.setUser(deviceDTO.getUser());
 
         return device;

@@ -18,8 +18,8 @@ public class MaterialDTO {
     private StateEquipment state;
     // TODO: replace type of the field "responsible" on userDTO
     private UUID responsible;
-    private TypeMaterial typeMaterial;
-    private Vendor vendor;
+    private TypeMaterialDTO typeMaterial;
+    private VendorDTO vendor;
     private RegistrationNumber registrationNumber;
 
 }
