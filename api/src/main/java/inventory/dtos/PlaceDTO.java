@@ -1,9 +1,8 @@
-package ru.larionov.inventoryservice.dto;
+package inventory.dtos;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -14,5 +13,5 @@ public class PlaceDTO {
     private String name;
     private String description;
     private UUID parent_id;
-    private RegistrationNumber registrationNumber;
+    private Long registrationNumber;
 }

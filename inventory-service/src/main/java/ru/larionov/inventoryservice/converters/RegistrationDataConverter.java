@@ -1,8 +1,7 @@
 package ru.larionov.inventoryservice.converters;
 
-import ru.larionov.inventoryservice.dto.RegistrationDataDTO;
+import inventory.dtos.RegistrationDataDTO;
 import ru.larionov.inventoryservice.entity.RegistrationEvent;
-import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.entity.RegistrationStatus;
 
 public class RegistrationDataConverter {

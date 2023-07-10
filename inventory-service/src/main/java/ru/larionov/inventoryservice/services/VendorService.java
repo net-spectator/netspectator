@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.larionov.inventoryservice.converters.VendorConverter;
-import ru.larionov.inventoryservice.dto.VendorDTO;
+import inventory.dtos.VendorDTO;
 import ru.larionov.inventoryservice.repository.VendorRepository;
 
 import java.util.List;

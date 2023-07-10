@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.larionov.inventoryservice.converters.TypeMaterialConverter;
-import ru.larionov.inventoryservice.dto.TypeMaterialDTO;
+import inventory.dtos.TypeMaterialDTO;
 import ru.larionov.inventoryservice.repository.TypeMaterialRepository;
 
 import java.util.List;

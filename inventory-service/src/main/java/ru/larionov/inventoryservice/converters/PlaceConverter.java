@@ -1,7 +1,8 @@
 package ru.larionov.inventoryservice.converters;
 
-import ru.larionov.inventoryservice.dto.PlaceDTO;
+import inventory.dtos.PlaceDTO;
 import ru.larionov.inventoryservice.entity.Place;
+import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.repository.PlaceRepository;
 
 public class PlaceConverter {
@@ -13,7 +14,7 @@ public class PlaceConverter {
         placeDTO.setName(place.getName());
         placeDTO.setDescription(place.getDescription());
         placeDTO.setParent_id(place.getParent().getId());
-        placeDTO.setRegistrationNumber(place.getRegistrationNumber());
+        placeDTO.setRegistrationNumber(place.getRegistrationNumber().getId());
 
         return placeDTO;
     }
@@ -27,7 +28,7 @@ public class PlaceConverter {
         place.setParent(
                 placeRepository.getReferenceById(placeDTO.getParent_id())
         );
-        place.setRegistrationNumber(placeDTO.getRegistrationNumber());
+        place.setRegistrationNumber(new RegistrationNumber(placeDTO.getRegistrationNumber()));
 
         return place;
     }

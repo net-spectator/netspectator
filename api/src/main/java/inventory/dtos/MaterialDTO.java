@@ -1,9 +1,9 @@
-package ru.larionov.inventoryservice.dto;
+package inventory.dtos;
 
+import inventory.enums.StateEquipment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.larionov.inventoryservice.entity.*;
 
 import java.util.UUID;
 
@@ -20,6 +20,6 @@ public class MaterialDTO {
     private UUID responsible;
     private TypeMaterialDTO typeMaterial;
     private VendorDTO vendor;
-    private RegistrationNumber registrationNumber;
+    private Long registrationNumber;
 
 }

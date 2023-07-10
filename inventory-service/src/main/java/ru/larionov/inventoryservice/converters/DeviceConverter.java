@@ -1,6 +1,6 @@
 package ru.larionov.inventoryservice.converters;
 
-import ru.larionov.inventoryservice.dto.DeviceDTO;
+import inventory.dtos.DeviceDTO;
 import ru.larionov.inventoryservice.entity.Device;
 import ru.larionov.inventoryservice.entity.RegistrationNumber;
 import ru.larionov.inventoryservice.views.DeviceWithDetailsDTO;
@@ -15,7 +15,7 @@ public class DeviceConverter {
         deviceDTO.setDescription(device.getDescription());
         deviceDTO.setResponsible(device.getResponsible());
         deviceDTO.setState(device.getState());
-        deviceDTO.setRegistrationNumber(device.getRegistrationNumber());
+        deviceDTO.setRegistrationNumber(device.getRegistrationNumber().getId());
         if (device.getTypeMaterial() != null)
             deviceDTO.setTypeMaterial(TypeMaterialConverter.toDTO(device.getTypeMaterial()));
         if (device.getVendor() != null)
@@ -34,7 +34,7 @@ public class DeviceConverter {
         deviceDTO.setResponsible(device.getResponsibleId());
         deviceDTO.setState(device.getState());
         if (device.getRegistrationNumber() != null)
-            deviceDTO.setRegistrationNumber(new RegistrationNumber(device.getRegistrationNumber()));
+            deviceDTO.setRegistrationNumber(device.getRegistrationNumber());
         if (device.getTypeMaterial() != null)
             deviceDTO.setTypeMaterial(TypeMaterialConverter.toDTO(device.getTypeMaterial()));
         if (device.getVendor() != null)
@@ -52,7 +52,7 @@ public class DeviceConverter {
         device.setDescription(deviceDTO.getDescription());
         device.setResponsible(deviceDTO.getResponsible());
         device.setState(deviceDTO.getState());
-        device.setRegistrationNumber(deviceDTO.getRegistrationNumber());
+        device.setRegistrationNumber(new RegistrationNumber(deviceDTO.getRegistrationNumber()));
         if (deviceDTO.getTypeMaterial() != null)
             device.setTypeMaterial(TypeMaterialConverter.fromDTO(deviceDTO.getTypeMaterial()));
         if (deviceDTO.getVendor() != null)

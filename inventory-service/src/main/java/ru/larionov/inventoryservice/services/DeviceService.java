@@ -1,22 +1,14 @@
 package ru.larionov.inventoryservice.services;
 
-import amq.entities.Message;
-import amq.entities.NotificationMessage;
-import amq.services.RabbitMQProducerService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.provider.HibernateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.larionov.inventoryservice.converters.DeviceConverter;
-import ru.larionov.inventoryservice.dto.DeviceDTO;
+import inventory.dtos.DeviceDTO;
 import ru.larionov.inventoryservice.entity.*;
 import ru.larionov.inventoryservice.exeptions.BadParametersOfRequest;
 import ru.larionov.inventoryservice.exeptions.TypeMaterialNotFound;

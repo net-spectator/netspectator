@@ -1,4 +1,4 @@
-package ru.larionov.inventoryservice.dto;
+package http.dtos;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

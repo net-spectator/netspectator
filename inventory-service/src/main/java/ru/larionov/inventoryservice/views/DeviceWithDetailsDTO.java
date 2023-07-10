@@ -1,5 +1,6 @@
 package ru.larionov.inventoryservice.views;
 
+import inventory.enums.StateEquipment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

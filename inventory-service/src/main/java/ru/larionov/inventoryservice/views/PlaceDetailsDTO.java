@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Subselect;
 import org.springframework.data.annotation.Immutable;
-import ru.larionov.inventoryservice.entity.TypePlace;
+import inventory.enums.TypePlace;
 
 @Entity
 @Immutable

@@ -2,7 +2,7 @@ package ru.larionov.inventoryservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.larionov.inventoryservice.dto.MaterialDTO;
+import inventory.dtos.MaterialDTO;
 import ru.larionov.inventoryservice.services.MaterialService;
 import java.util.List;
 import java.util.UUID;
