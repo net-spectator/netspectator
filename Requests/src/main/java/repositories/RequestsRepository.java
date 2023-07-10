@@ -12,6 +12,5 @@ import java.util.List;
 @Repository
 public interface RequestsRepository extends JpaRepository<Requests, Long> {
     List<Requests> findAllByUsername(String username);
-
     Page<Requests> findAll(Specification<Requests> spec, PageRequest of);
 }

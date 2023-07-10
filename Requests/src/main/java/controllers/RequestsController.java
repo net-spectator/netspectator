@@ -3,11 +3,11 @@ package controllers;
 import converters.RequestsConverter;
 import entities.Requests;
 import entities.RequestsDto;
+import inventory.dtos.DeviceDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.larionov.inventoryservice.dto.DeviceDTO;
 import services.RequestsService;
 import users.dtos.UserDTO;
 

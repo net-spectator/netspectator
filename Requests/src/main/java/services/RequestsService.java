@@ -1,6 +1,7 @@
 package services;
 
 import entities.Requests;
+import inventory.dtos.DeviceDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +12,6 @@ import repositories.RequestsStatusRepository;
 import javax.transaction.Transactional;
 
 import repositories.specifications.RequestsSpecifications;
-import ru.larionov.inventoryservice.dto.DeviceDTO;
 import users.dtos.UserDTO;
 
 import java.util.List;

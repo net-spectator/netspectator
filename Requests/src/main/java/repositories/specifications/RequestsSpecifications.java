@@ -1,8 +1,8 @@
 package repositories.specifications;
 
 import entities.Requests;
+import inventory.dtos.DeviceDTO;
 import org.springframework.data.jpa.domain.Specification;
-import ru.larionov.inventoryservice.dto.DeviceDTO;
 import users.dtos.UserDTO;
 
 public class RequestsSpecifications {

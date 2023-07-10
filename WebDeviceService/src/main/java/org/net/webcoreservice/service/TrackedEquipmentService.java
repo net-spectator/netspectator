@@ -1,7 +1,7 @@
 package org.net.webcoreservice.service;
 
 import entities.devices.ClientHardwareInfo;
-import entities.nodes.DetectedNode;
+import inventory.dtos.nodes.DetectedNode;
 import lombok.RequiredArgsConstructor;
 import org.net.webcoreservice.Enum.BlackListStatus;
 import org.net.webcoreservice.dto.TrackedEquipmentDto;
