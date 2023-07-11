@@ -9,11 +9,13 @@ services:
       - "9080:9080"
     environment:
       SERVER_PORT: 9080
-      DB_HOST: keycloak-postgres
-      DB_PORT: 5432
-      DB_NAME: notifications
-      DB_USER: w0id
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/ns-user-manage
+      DB_USERNAME: w0id
       DB_PASSWORD: 2311
+      KC_USERNAME: ns-reader
+      KC_PASSWORD: 2311
+      REALM: netspectator
+      TYPE_ATTR: ns_user
       INTROSPECTION_URI: http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect
       KEYCLOAK_SERVER_URI: http://keycloak:8080/
     depends_on:
@@ -30,7 +32,8 @@ services:
     environment:
       SERVER_PORT: 9100
       INTROSPECTION_URI: http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect
-      USER_MANAGE_HOST: user-manage-svc:9080
+      USER_MANAGE_URI: http://user-manage-svc:9080
+      USER_URI: http://user-svc:9090
     depends_on:
       keycloak:
         condition: service_healthy
@@ -44,9 +47,8 @@ services:
       - "9090:9090"
     environment:
       SERVER_PORT: 9090
-      DB_HOST: keycloak-postgres:5432
-      DB_NAME: notifications
-      DB_USER: w0id
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/ns-user-manage
+      DB_USERNAME: w0id
       DB_PASSWORD: 2311
     depends_on:
       keycloak-postgres:
@@ -61,9 +63,8 @@ services:
       - "8190:8190"
     environment:
       SERVER_PORT: 8190
-      DB_HOST: keycloak-postgres:5432
-      DB_NAME: notifications
-      DB_USER: w0id
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/notifications
+      DB_USERNAME: w0id
       DB_PASSWORD: 2311
       BASE_URL: http://user-svc:9090
       MQ_HOST: rabbitmq
@@ -80,6 +81,7 @@ services:
       - "8085:8085"
     environment:
       IS_PORT: 8085
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/db_is
       IS_DB_URL: keycloak-postgres:5432
       IS_DB_USER: w0id
       IS_DB_PASSWORD: 2311
@@ -109,8 +111,7 @@ services:
       - "5679:5679"
     environment:
       SERVER_PORT: 8181
-      DB_HOST: keycloak-postgres:5432
-      DB_NAME: deviceService
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/deviceService
       DB_USERNAME: w0id
       DB_PASSWORD: 2311
     depends_on:
@@ -161,7 +162,7 @@ services:
     volumes:
       - ./docker/keycloak/:/opt/keycloak/data/import/:ro
     ports:
-      - 8282:8080
+      - 8080:8080
     depends_on:
       keycloak-postgres:
         condition: service_healthy

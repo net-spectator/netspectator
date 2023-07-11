@@ -5,7 +5,7 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:keycloak-postgres:5432}/${DB_NAME:deviceService}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://keycloak-postgres:5432/deviceService}
     username: ${DB_USERNAME:w0id}
     password: ${DB_PASSWORD:2311}
   jpa:
