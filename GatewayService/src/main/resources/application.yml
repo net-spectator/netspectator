@@ -1,15 +1,15 @@
 server:
   port: 9100
-#logging:
-#  level:
+logging:
+  level:
 #    root: debug
-#    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: trace
+    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: trace
 spring:
   security:
     oauth2:
       resourceserver:
         opaquetoken:
-          introspection-uri: http://keykloak:8080/realms/netspectator/protocol/openid-connect/token/introspect
+          introspection-uri: ${INTROSPECTION_URI:http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect}
           client-id: javaclient
           client-secret: ZnMtpRXWvGO3h4CSHAGmAtAanTfTAuri
   cloud:
@@ -18,11 +18,11 @@ spring:
         enabled: false
       routes:
         - id: users
-          uri: http://user-manage-svc:9080
+          uri: ${USER_URI:http://user-svc:9090}
           predicates:
             - Path=/api/v1/users/**
         - id: checkUser
-          uri: http://user-manage-svc:9080
+          uri: ${USER_MANAGE_URI:http://user-manage-svc:9080}
           predicates:
             - Path=/api/v1/check/**
 introspect_field: sub

@@ -12,8 +12,8 @@ spring:
       exchange: netspectator-exchange
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:keycloak-postgres:5432}/${DB_NAME:notifications}
-    username: ${DB_USER:w0id}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://keycloak-postgres:5432/notifications}
+    username: ${DB_USERNAME:w0id}
     password: ${DB_PASSWORD:2311}
   jpa:
     show-sql: true
