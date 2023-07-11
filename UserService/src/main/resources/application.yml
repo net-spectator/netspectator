@@ -5,8 +5,8 @@ spring:
     exclude: org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:localhost:5435}/${DB_NAME:ns-user-manage}
-    username: ${DB_USER:w0id}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://keycloak-postgres:5432/ns-user-manage}
+    username: ${DB_USERNAME:w0id}
     password: ${DB_PASSWORD:2311}
   jpa:
     show-sql: true

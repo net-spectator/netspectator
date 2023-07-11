@@ -12,9 +12,9 @@ spring:
           client-secret: ZnMtpRXWvGO3h4CSHAGmAtAanTfTAuri
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://keycloak-postgres:5432/ns-user-manage
-    username: w0id
-    password: 2311
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://keycloak-postgres:5432/ns-user-manage}
+    username: ${DB_USERNAME:w0id}
+    password: ${DB_PASSWORD:2311}
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -25,13 +25,13 @@ spring:
       pool:
         size: 5
 check-delay: 60000
-realm: netspectator
-type-attribute: ns_user
+realm: ${REALM:netspectator}
+type-attribute: ${TYPE_ATTR:ns_user}
 keycloak:
   management:
     props:
       server-url: ${KEYCLOAK_SERVER_URI:http://keycloak:8080/}
-      master-realm: netspectator
-      username: ns-reader
-      password: 2311
+      master-realm: ${REALM:netspectator}
+      username: ${KC_USERNAME:ns-reader}
+      password: ${KC_PASSWORD:2311}
       client-id: admin-cli
