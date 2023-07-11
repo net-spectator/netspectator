@@ -2437,8 +2437,8 @@
     "enabled" : true,
     "totp" : false,
     "emailVerified" : false,
-    "firstName" : "Рогов",
-    "lastName" : "Николаевич",
+    "firstName" : "Алексей",
+    "lastName" : "Рогов",
     "email" : "xcrypter@gmail.com",
     "attributes" : {
       "department" : [ "ДИТ" ],
