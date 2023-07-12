@@ -19,7 +19,7 @@ spring:
       exchange: netspectator-exchange
   data:
     mongodb:
-      host: ${MONGODB_HOST:mongodb}
+      uri: ${MONGODB_URI:mongodb://mongodb:27017}
 mongo:
   database: netspectator
   collection: logs

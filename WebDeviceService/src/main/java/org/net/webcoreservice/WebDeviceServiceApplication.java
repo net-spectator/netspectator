@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import services.ClientListenersStarter;
 import utils.ModuleName;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -12,9 +13,12 @@ import java.util.concurrent.Executors;
 public class WebDeviceServiceApplication {
     public static void main(String[] args) {
         ModuleName.getModuleName().setName("WebDeviceService");
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(ClientListenersStarter::new);
         SpringApplication.run(WebDeviceServiceApplication.class, args);
     }
 
+    @PostConstruct
+    public void init() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(ClientListenersStarter::new);
+    }
 }
