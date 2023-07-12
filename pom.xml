@@ -20,7 +20,6 @@
         <module>NotificationService</module>
         <module>LoggerService</module>
         <module>UserService</module>
-        <module>TestSpringLog</module>
     </modules>
 
     <properties>
