@@ -98,8 +98,11 @@ services:
       - "9070:9070"
     environment:
       SERVER_PORT: 9070
-      MONGODB_HOST: mongodb
+      MONGODB_URI: mongodb://mongodb:27017
       MQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   web-device-svc:
     image: ns-webdevicesvc
@@ -146,7 +149,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.2
-    #    build: keycloak
     container_name: ns-keycloak
     command:
       - start --auto-build --db postgres --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm --spi-user-profile-legacy-user-profile-read-only-attributes *_RES_ACCESS_MODE
@@ -186,6 +188,12 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 5s
 
   mongodb:
     image: mongo:6.0.1
