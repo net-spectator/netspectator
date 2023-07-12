@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: UserManagementService/Dockerfile
-    ports:
-      - "9080:9080"
+#    ports:
+#      - "9080:9080"
     environment:
       SERVER_PORT: 9080
       SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/ns-user-manage
@@ -43,8 +43,8 @@ services:
     build:
       context: .
       dockerfile: UserService/Dockerfile
-    ports:
-      - "9090:9090"
+#    ports:
+#      - "9090:9090"
     environment:
       SERVER_PORT: 9090
       SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/ns-user-manage
@@ -59,8 +59,8 @@ services:
     build:
       context: .
       dockerfile: NotificationService/Dockerfile
-    ports:
-      - "8190:8190"
+#    ports:
+#      - "8190:8190"
     environment:
       SERVER_PORT: 8190
       SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/notifications
@@ -77,8 +77,8 @@ services:
     build:
       context: .
       dockerfile: inventory-service/Dockerfile
-    ports:
-      - "8085:8085"
+#    ports:
+#      - "8085:8085"
     environment:
       IS_PORT: 8085
       SPRING_DATASOURCE_URL: jdbc:postgresql://keycloak-postgres:5432/db_is
@@ -94,12 +94,15 @@ services:
     build:
       context: .
       dockerfile: LoggerService/Dockerfile
-    ports:
-      - "9070:9070"
+#    ports:
+#      - "9070:9070"
     environment:
       SERVER_PORT: 9070
-      MONGODB_HOST: mongodb
+      MONGODB_URI: mongodb://mongodb:27017
       MQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   web-device-svc:
     image: ns-webdevicesvc
@@ -107,7 +110,7 @@ services:
       context: .
       dockerfile: WebDeviceService/Dockerfile
     ports:
-      - "8181:8181"
+#      - "8181:8181"
       - "5679:5679"
     environment:
       SERVER_PORT: 8181
@@ -137,8 +140,8 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
-    ports:
-      - ${KC_POSTGRES_PORT_MAPPING:-5435}:5432
+#    ports:
+#      - ${KC_POSTGRES_PORT_MAPPING:-5435}:5432
     deploy:
       resources:
         limits:
@@ -146,7 +149,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.2
-    #    build: keycloak
     container_name: ns-keycloak
     command:
       - start --auto-build --db postgres --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm --spi-user-profile-legacy-user-profile-read-only-attributes *_RES_ACCESS_MODE
@@ -183,15 +185,21 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: rmuser
       RABBITMQ_DEFAULT_PASS: rmpassword
-    ports:
-      - 5672:5672
-      - 15672:15672
+ #   ports:
+ #     - 5672:5672
+ #     - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 5s
 
   mongodb:
     image: mongo:6.0.1
     container_name: ns-mongodb
-    ports:
-      - 27017:27017
+#    ports:
+#      - 27017:27017
     command: ["mongod", "--port", "27017"]
     volumes:
       - ./docker/dbdata:/data/db
