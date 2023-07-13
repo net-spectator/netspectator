@@ -3,13 +3,14 @@ package org.net.users.controllers;
 import lombok.RequiredArgsConstructor;
 import org.net.users.converters.UserConverter;
 import org.net.users.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import users.dtos.RoleDTO;
 import users.dtos.UserDTO;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -22,12 +23,29 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDTO> getUsers() {
-        return userService.getUsers();
+    public ResponseEntity<List<UserDTO>> getUsers(@RequestHeader(value = "x-introspect", required = false) UUID userID) {
+        if (checkRole(userID) || Objects.isNull(userID)) {
+            return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @GetMapping("{uuid}")
-    public UserDTO getUser(@PathVariable UUID uuid) {
-        return userConverter.toDTO(userService.getUser(uuid).get());
+    public ResponseEntity<UserDTO> getUser(@RequestHeader(value = "x-introspect", required = false) UUID userID, @PathVariable UUID uuid) {
+        if (checkRole(userID) || uuid.equals(userID) || Objects.isNull(userID)) {
+            return new ResponseEntity<>(userConverter.toDTO(userService.getUser(uuid).get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    public Boolean checkRole(UUID userID) {
+        if (null != userID) {
+            UserDTO user = userConverter.toDTO(userService.getUser(userID).get());
+            RoleDTO role_admin = user.getRoles().stream().filter(r -> r.getTitle().equals("ROLE_ADMIN")).findFirst().orElse(null);
+            return null != role_admin;
+        }
+        return false;
     }
 }
