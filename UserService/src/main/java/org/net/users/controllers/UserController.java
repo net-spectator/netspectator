@@ -10,6 +10,7 @@ import users.dtos.RoleDTO;
 import users.dtos.UserDTO;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +24,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> getUsers(@RequestHeader(value = "x-introspect", required = false) UUID userID) {
-        if (checkRole(userID)) {
+        if (checkRole(userID) || Objects.isNull(userID)) {
             return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -32,7 +33,7 @@ public class UserController {
 
     @GetMapping("{uuid}")
     public ResponseEntity<UserDTO> getUser(@RequestHeader(value = "x-introspect", required = false) UUID userID, @PathVariable UUID uuid) {
-        if (checkRole(userID) || userID.equals(uuid)) {
+        if (checkRole(userID) || uuid.equals(userID) || Objects.isNull(userID)) {
             return new ResponseEntity<>(userConverter.toDTO(userService.getUser(uuid).get()), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -40,8 +41,11 @@ public class UserController {
     }
 
     public Boolean checkRole(UUID userID) {
-        UserDTO user = userConverter.toDTO(userService.getUser(userID).get());
-        RoleDTO role_admin = user.getRoles().stream().filter(r -> r.getTitle().equals("ROLE_ADMIN")).findFirst().orElse(null);
-        return null != role_admin;
+        if (null != userID) {
+            UserDTO user = userConverter.toDTO(userService.getUser(userID).get());
+            RoleDTO role_admin = user.getRoles().stream().filter(r -> r.getTitle().equals("ROLE_ADMIN")).findFirst().orElse(null);
+            return null != role_admin;
+        }
+        return false;
     }
 }
