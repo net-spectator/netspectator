@@ -14,17 +14,8 @@
     <name>WebCoreService</name>
     <description>WebCoreService</description>
 
-    <repositories>
-        <repository>
-            <id>project.local</id>
-            <name>netspactator</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
-    </repositories>
-
     <properties>
         <java.version>11</java.version>
-        <start-class>org.net.webcoreservice.WebDeviceServiceApplication</start-class>
     </properties>
 
     <dependencies>
@@ -92,21 +83,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>org.net.webcoreservice.WebDeviceServiceApplication</mainClass>
-                    <layout>JAR</layout>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

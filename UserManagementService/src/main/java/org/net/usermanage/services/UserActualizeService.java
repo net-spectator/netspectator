@@ -4,14 +4,12 @@ import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.net.usermanage.converters.DetailsConverter;
-import org.net.users.converters.UserConverter;
 import org.net.users.entities.Role;
 import org.net.users.entities.User;
 import org.net.users.entities.UserDetails;
 import org.net.users.repositories.UserRepository;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.stereotype.Service;
-import users.dtos.UserDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +21,6 @@ public class UserActualizeService {
 
     private final UserRepository userRepository;
     private final DetailsConverter detailsConverter;
-    private final UserConverter userConverter;
 
     private final RoleService roleService;
 

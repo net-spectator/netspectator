@@ -21,6 +21,10 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      keycloak-postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   gateway-svc:
     image: ns-gatewaysvc
@@ -37,6 +41,8 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   user-svc:
     image: ns-usersvc
@@ -52,6 +58,8 @@ services:
       DB_PASSWORD: 2311
     depends_on:
       keycloak-postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   notification-svc:
@@ -71,6 +79,8 @@ services:
     depends_on:
       keycloak-postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   inventory-svc:
     image: ns-inventorysvc
@@ -87,6 +97,8 @@ services:
       IS_DB_PASSWORD: 2311
     depends_on:
       keycloak-postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   logger-svc:
@@ -119,6 +131,8 @@ services:
       DB_PASSWORD: 2311
     depends_on:
       keycloak-postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   keycloak-postgres:
