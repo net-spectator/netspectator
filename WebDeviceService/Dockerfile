@@ -1,13 +1,7 @@
-FROM maven:3.8.4-openjdk-17 as builder
-WORKDIR /app
-COPY repo /app/repo
-COPY WebDeviceService /app/.
-RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true spring-boot:repackage
-
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 RUN mkdir resources
-COPY --from=builder /app/target/*.jar /app/WebDeviceService.jar
+COPY WebDeviceService/target/WebDeviceService-0.0.1-SNAPSHOT.jar /app/WebDeviceService.jar
 COPY WebDeviceService/src/main/resources/server.properties /app/resources
 EXPOSE 8181
 ENTRYPOINT ["java", "-jar", "/app/WebDeviceService.jar"]

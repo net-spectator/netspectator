@@ -14,17 +14,8 @@
 	<name>NotificationService</name>
 	<description>NotificationService</description>
 
-	<repositories>
-		<repository>
-			<id>project.local</id>
-			<name>netspactator</name>
-			<url>file:${project.basedir}/repo</url>
-		</repository>
-	</repositories>
-
 	<properties>
 		<java.version>11</java.version>
-		<start-class>com.example.notificationservice.NotificationServiceApplication</start-class>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -64,12 +55,6 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.amqp</groupId>-->
-<!--			<artifactId>spring-rabbit</artifactId>-->
-<!--			<version>3.0.5</version>-->
-<!--		</dependency>-->
-
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -94,21 +79,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>com.example.notificationservice.NotificationServiceApplication</mainClass>
-					<layout>JAR</layout>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

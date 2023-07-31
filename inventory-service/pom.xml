@@ -15,16 +15,7 @@
     <description>This is service that does inventory of equipment, gives registration numbers to equipment.</description>
     <properties>
         <java.version>11</java.version>
-        <start-class>ru.larionov.inventoryservice.InventoryServiceApplication</start-class>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>project.local</id>
-            <name>netspactator</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -92,21 +83,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>ru.larionov.inventoryservice.InventoryServiceApplication</mainClass>
-                    <layout>JAR</layout>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

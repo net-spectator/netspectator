@@ -1,11 +1,5 @@
-FROM maven:3.8.4-openjdk-17 as builder
-WORKDIR /app
-COPY repo /app/repo
-COPY NotificationService /app/.
-RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true spring-boot:repackage
-
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/*.jar /app/NotificationService.jar
+COPY NotificationService/target/NotificationService-0.0.1-SNAPSHOT.jar /app/NotificationService.jar
 EXPOSE 8190
 ENTRYPOINT ["java", "-jar", "/app/NotificationService.jar"]
