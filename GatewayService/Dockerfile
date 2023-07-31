@@ -1,11 +1,5 @@
-FROM maven:3.8.4-openjdk-17 as builder
-WORKDIR /app
-COPY repo /app/repo
-COPY GatewayService /app/.
-RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true spring-boot:repackage
-
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/*.jar /app/GatewayService.jar
+COPY GatewayService/target/GatewayService-1.0.jar /app/GatewayService.jar
 EXPOSE 9100
 ENTRYPOINT ["java", "-jar", "/app/GatewayService.jar"]
