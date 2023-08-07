@@ -25,4 +25,8 @@ spring:
           uri: ${USER_MANAGE_URI:http://user-manage-svc:9080}
           predicates:
             - Path=/api/v1/check/**
+        - id: webDevice
+          uri: ${WEB_DEVICE_URI:http://web-device-svc:8181}
+          predicates:
+            - Path=/core/**
 introspect_field: sub
