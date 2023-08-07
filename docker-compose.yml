@@ -38,6 +38,7 @@ services:
       INTROSPECTION_URI: http://keycloak:8080/realms/netspectator/protocol/openid-connect/token/introspect
       USER_MANAGE_URI: http://user-manage-svc:9080
       USER_URI: http://user-svc:9090
+      WEB_DEVICE_URI: http://web-device-svc:8181
     depends_on:
       keycloak:
         condition: service_healthy
